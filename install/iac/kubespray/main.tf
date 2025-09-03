@@ -116,9 +116,7 @@ resource "null_resource" "setup_kubespray_venv" {
 
       # Find Python executable (try python3 first, then python)
       PYTHON_CMD=""
-      if command -v python3.10 &> /dev/null; then
-        PYTHON_CMD="/opt/homebrew/bin/python3.10"
-      elif command -v python3 &> /dev/null; then
+      if command -v python3 &> /dev/null; then
         PYTHON_CMD="python3"
       elif command -v python &> /dev/null; then
         # Verify it's Python 3

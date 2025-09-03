@@ -12,6 +12,14 @@ The terraform state file will be stored in an S3 bucket
 - Requires-Python >=3.10
 - Terraform >=v1.11.1
 
+```
+# Ubuntu 24.04
+apt install unzip -y
+apt install make -y
+
+```
+
+
 **NOTE:** The brew installed Python works for Macs `brew install python@3.10`
 ### Create S3 Bucket
 - Give it a unique name
@@ -42,7 +50,7 @@ IAM Policy:
         {
             "Effect": "Allow",
             "Action": "s3:ListBucket",
-            "Resource": "arn:aws:s3:::genelab"
+            "Resource": "arn:aws:s3:::BUCKET_NAME"
         },
         {
             "Effect": "Allow",
@@ -78,16 +86,16 @@ IAM Policy:
 
 ## Configure IaC files
 
-The starting point is creating a directory for the new cluster within the infrastructure directory.
-```
-mkdir -p infrastructure/clusters/demo-cluster
+The starting point is to copy the init directory into the new clusters directory
 
-├── base
-│   └── iac
+```
+
+├── infrastructure
+│   └── init
 │       ├── main.tf
 │       ├── provider.tf
 │       └── variables.tf
-├── infrastructure
+│       └── Makefile
 │   └── clusters
 │       ├── demo-cluster
 │       └── production
@@ -97,8 +105,9 @@ mkdir -p infrastructure/clusters/demo-cluster
 ### Copy the base OpenTofu files to the new directory
 
 ```
- cd openCenter
- cp -r base/iac infrastructure/clusters/demo-cluster
+# cd /etc/openCenter
+# cp -r infrastructure/init infrastructure/clusters/demo-cluster
+# cd infrastructure/clusters/demo-cluster
 ```
 
 ### Configure the OpenTofu files
@@ -148,13 +157,26 @@ export AWS_ACCESS_KEY_ID=<KEY>
 export AWS_SECRET_ACCESS_KEY=<KEY>
 ```
 
+## Install Terraform binary
+From within each cluster directory we want to install in a local .bin directory as there may be a case where newer clusters get deployed with a much newer and incompatible version.
+
+`make terraform`
+
+## Add terraform to PATH
+```
+export BIN=${PWD]/.bin
+export PATH=${BIN}:${PATH}
+
+```
 
 ## Deploy IAC
 
 ```
-# cd infrastructure/clusters/demo-cluster
 # terraform init
 ```
+The terraform init needs to access modules in git which can be done with SSH keys or a Git Token.
+If you want to use the SSH Key method each module source will use: `git@github.com:rackerlabs/openCenter.git`
+For Token `github.com/rackerlabs/openCenter.git`
 
 If the init succeeds you are good to apply
 
