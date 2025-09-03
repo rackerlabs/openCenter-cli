@@ -12,7 +12,7 @@ The terraform state file will be stored in an S3 bucket
 - Requires-Python >=3.10
 - python3.10-venv
 - Terraform >=v1.11.1
-
+- kubectl
 ```
 # Ubuntu 24.04
 apt install unzip -y
@@ -190,6 +190,16 @@ If the init succeeds you are good to apply
 # terraform apply
 ```
 
+## Use the cluster
+
+### Install the kubectl binary
+`make kubectl`
+
+```
+export KUBECONFIG=${PWD}/kubeconfig.yaml
+
+kubectl get nodes
+```
 
 # Infrastructure
 
