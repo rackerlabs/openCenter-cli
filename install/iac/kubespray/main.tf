@@ -110,6 +110,7 @@ resource "null_resource" "setup_kubespray_venv" {
   depends_on = [null_resource.clone_kubespray]
 
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     command = <<-EOT
       #!/bin/bash
       set -e
@@ -219,6 +220,7 @@ resource "null_resource" "os_hardening" {
   depends_on = [null_resource.wait_cloudinit, local_file.os_hardening_playbook,null_resource.setup_kubespray_venv]
 
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     environment = {
       ANSIBLE_INVENTORY         = "${path.cwd}/inventory/inventory.yaml"
       ANSIBLE_HOST_KEY_CHECKING = "False"
@@ -244,6 +246,7 @@ resource "null_resource" "run_kubespray" {
   depends_on = [null_resource.wait_cloudinit, null_resource.os_hardening, null_resource.clone_kubespray,null_resource.setup_kubespray_venv]
 
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     environment = {
       ANSIBLE_INVENTORY         = "${path.cwd}/inventory/inventory.yaml"
       ANSIBLE_HOST_KEY_CHECKING = "False"
@@ -281,6 +284,7 @@ resource "null_resource" "copy_and_update_kubeconfig" {
   depends_on = [null_resource.wait_cloudinit, null_resource.run_kubespray[0]]
 
   provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
     environment = {
       ANSIBLE_INVENTORY         = "${path.cwd}/inventory/inventory.yaml"
       ANSIBLE_HOST_KEY_CHECKING = "False"

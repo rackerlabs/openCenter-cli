@@ -10,6 +10,7 @@ The terraform state file will be stored in an S3 bucket
 
 ## Pre Requisites
 - Requires-Python >=3.10
+- python3.10-venv
 - Terraform >=v1.11.1
 
 ```
