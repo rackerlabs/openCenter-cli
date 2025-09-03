@@ -115,6 +115,8 @@ The starting point is to copy the init directory into the new clusters directory
 
 **provider.tf**
 
+Update the BUCKET_NAME wiht the S3 bucket and CLUSTER_NAME with the unique cluster name.
+
 ```
 terraform {
   backend "s3" {
@@ -132,6 +134,9 @@ terraform {
 **NOTE:** The main.tf in base is configured to work on Openstack Flex in SJC3 it will use Kube-VIP with a floating IP associated to expose the Kubernetes API publicly. When deploying in another cloud more settings will need to be updated.
 
 These are the minimum required changes;  further configuration options are documented later in this document
+
+Replace the cluster and Tenant names accordignly.
+Pick a CIDR that is available for the servers or VMs and reokace it in the subnet_nodes.
 
 ```
 locals {
