@@ -292,7 +292,7 @@ resource "null_resource" "copy_and_update_kubeconfig" {
 
     command = <<-EOT
       #!/bin/bash
-
+      source venv/bin/activate
       echo "=== Step 1: Copy /etc/kubernetes/admin.conf from remote server ==="
       ansible kube_control_plane[0] \
         -b \
