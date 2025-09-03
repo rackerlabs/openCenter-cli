@@ -1,0 +1,6 @@
+[submodule "third-party/genestack"]
+	path = third-party/genestack
+	url = https://github.com/rackerlabs/genestack.git
+[submodule "third-party/kubespray"]
+	path = third-party/kubespray
+	url = https://github.com/kubernetes-sigs/kubespray.git
