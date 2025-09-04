@@ -156,10 +156,6 @@ resource "null_resource" "setup_kubespray_venv" {
     EOT
   }
 
-  # Optional: trigger recreation if requirements.txt changes
-  triggers = {
-    requirements_hash = fileexists("./kubespray/requirements.txt") ? filemd5("./kubespray/requirements.txt") : ""
-  }
 }
 
 
