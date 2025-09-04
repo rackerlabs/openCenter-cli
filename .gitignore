@@ -63,3 +63,14 @@ build/
 
 # 
 applications/overlays
+
+
+# openCenter repo specific
+/bin/
+/tools/
+/vendor/
+godoc.log
+.env
+gitea/
+.gitea_admin_token
+.gitea_newuser_token
