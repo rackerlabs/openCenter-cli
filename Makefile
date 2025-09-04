@@ -39,7 +39,7 @@ help: ## Display this help screen
 .PHONY: build
 build: ## Build the application binary
 	@echo "Building $(BINARY_NAME)..."
-	@go build -o $(BINARY_PATH) ./cmd/openCenter
+	@go build -o $(BINARY_PATH) main.go
 
 .PHONY: tidy
 tidy: ## Install and tidy dependencies
