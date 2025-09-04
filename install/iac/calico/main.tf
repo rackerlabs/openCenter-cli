@@ -14,6 +14,6 @@ resource "local_file" "calico_values" {
       k8s_api_port                     = var.k8s_api_port
   })
 
-  filename = "${path.cwd}/cni-values.yml"
+  filename = "${path.root}/../../../applications/overlays/${var.cluster_name}/managed-services/calico/helm-values/override_values.yaml"
 
 }

@@ -1,5 +1,6 @@
 locals {
   ssh_key_path     = var.ssh_key_path == "" ? "${path.cwd}/id_rsa" : var.ssh_key_path
+  os_hardening_resource = var.os_hardening_enabled == true ? null_resource.os_hardening : null
 }
 
 
@@ -97,10 +98,11 @@ resource "null_resource" "clone_kubespray" {
     command = <<EOT
       if [ ! -d "./kubespray" ]; then
         git clone https://github.com/kubernetes-sigs/kubespray.git ./kubespray
-        cd ./kubespray && git checkout ${var.kubespray_version}
+        
       else
         echo "Directory ./kubespray already exists. Skipping clone."
       fi
+      cd ./kubespray && git checkout ${var.kubespray_version}
     EOT
   }
 }
@@ -211,6 +213,24 @@ resource "local_file" "os_hardening_playbook" {
   filename = "./inventory/os_hardening_playbook.yml"
 }
 
+resource "null_resource" "clone_ansible_hardening" {
+  count      = var.os_hardening_enabled == true ? 1 : 0
+
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+
+    command = <<-EOT
+      #!/bin/bash
+
+      if [ ! -d "./inventory/roles/ansible-hardening" ]; then
+      git clone https://opendev.org/openstack/ansible-hardening ./inventory/roles/ansible-hardening
+      echo "Running OS hardening playbook"
+      fi
+      cd ./inventory/roles/ansible-hardening && git checkout ${var.ansible_hardening_version}
+    EOT
+  }
+}
+
 resource "null_resource" "os_hardening" {
   count      = var.os_hardening_enabled == true ? 1 : 0
   depends_on = [null_resource.wait_cloudinit, local_file.os_hardening_playbook,null_resource.setup_kubespray_venv]
@@ -227,11 +247,7 @@ resource "null_resource" "os_hardening" {
       #!/bin/bash
 
       source venv/bin/activate
-
-      if [ ! -d "./inventory/roles/ansible-hardening" ]; then
-      git clone https://github.com/openstack/ansible-hardening ./inventory/roles/ansible-hardening
-      echo "Running OS hardening playbook"
-      fi
+      echo "Running OS hardening playbook with inventory: $ANSIBLE_INVENTORY"
       ansible-playbook ./inventory/os_hardening_playbook.yml -f 10 -b --become-user=root
     EOT
   }
@@ -239,7 +255,7 @@ resource "null_resource" "os_hardening" {
 
 resource "null_resource" "run_kubespray" {
   count      = var.deploy_cluster ? 1 : 0
-  depends_on = [null_resource.wait_cloudinit, null_resource.os_hardening, null_resource.clone_kubespray,null_resource.setup_kubespray_venv]
+  depends_on = [null_resource.wait_cloudinit, local.os_hardening_resource, null_resource.clone_kubespray,null_resource.setup_kubespray_venv]
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]

@@ -22,6 +22,11 @@ apt install make -y
 
 
 **NOTE:** The brew installed Python works for Macs `brew install python@3.10`
+Ended up using pyenv on the Mac
+
+
+
+
 ### Create S3 Bucket
 - Give it a unique name
 - Enable `Block all public access`
@@ -108,6 +113,9 @@ The starting point is to copy the init directory into the new clusters directory
 ```
 # cd /etc/openCenter
 # cp -r infrastructure/init infrastructure/clusters/demo-cluster
+# mkdir -p applications/overlays/demo-cluster/managed-services/calico/helm-values
+
+
 # cd infrastructure/clusters/demo-cluster
 ```
 
@@ -170,7 +178,7 @@ From within each cluster directory we want to install in a local .bin directory 
 
 ## Add terraform to PATH
 ```
-export BIN=${PWD]/.bin
+export BIN=${PWD}/.bin
 export PATH=${BIN}:${PATH}
 
 ```

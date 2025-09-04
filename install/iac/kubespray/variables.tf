@@ -164,7 +164,12 @@ variable "network_plugin" {
 variable "os_hardening_enabled" {
   type        = bool
   default     = false
-  description = "Enable hardening for the operating system. This will apply settings to the OS from https://github.com/openstack/ansible-hardening"
+  description = "Enable hardening for the operating system. This will apply settings to the OS from https://opendev.org/openstack/ansible-hardening"
+}
+
+variable "ansible_hardening_version"  {
+  type    = string
+  default = "stable/2025.1"
 }
 
 variable "ssh_key_path" {

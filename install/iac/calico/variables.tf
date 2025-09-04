@@ -43,6 +43,11 @@ variable "chart_repo" {
   default = "https://docs.tigera.io/calico/charts"
 }
 
+variable "cluster_name" {
+  type    = string
+  default = ""
+}
+
 variable "cni_iface" {
   type    = string
   default = ""
