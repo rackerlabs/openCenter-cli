@@ -6,35 +6,72 @@ We use OpenTofu to deploy virtual machines on OpenStack, using the outputs of th
 
 The terraform state file will be stored in an S3 bucket
 
-# Steps to deploy
+This will configure a Ubuntu 24.04 Linux VM as a deployment node that will be used to bootstrap and deploy openCenter clusters. The VM can go away once the resulting files have been committed to a code repository.
+The deployment node could be your laptop or an existing Linux VM. 
+
+
+- [openCenter Deployment Guide](#opencenter-deployment-guide)
+  - [Pre Requisites](#pre-requisites)
+    - [Packages](#packages)
+      - [Add local binaries to PATH](#add-local-binaries-to-path)
+    - [OpenTofu Requirements](#opentofu-requirements)
+      - [Create S3 Bucket](#create-s3-bucket)
+      - [Create access policy for Bucket](#create-access-policy-for-bucket)
+      - [Create AWS User](#create-aws-user)
+  - [GitOps Workflow](#gitops-workflow)
+    - [Initialize the new cluster OpenTofu files](#initialize-the-new-cluster-opentofu-files)
+    - [Configure the OpenTofu files](#configure-the-opentofu-files)
+    - [Export credentials](#export-credentials)
+  - [Deploy Cluster](#deploy-cluster)
+  - [Use the cluster](#use-the-cluster)
+    - [Kubeconfig](#kubeconfig)
+    - [Ansible](#ansible)
+  - [Post Deployment Steps](#post-deployment-steps)
+    - [Deploy a CNI](#deploy-a-cni)
+    - [Complete the Hardening by deploying CSR Approver](#complete-the-hardening-by-deploying-csr-approver)
+    - [Bootstrap Flux](#bootstrap-flux)
+      - [Steps](#steps)
+- [Outcome](#outcome)
+  - [Virtual Machines](#virtual-machines)
+  - [Kubernetes Cluster](#kubernetes-cluster)
+- [Infra Module Configuration Options](#infra-module-configuration-options)
+- [To Do's:](#to-dos)
+
+
+# openCenter Deployment Guide
 
 ## Pre Requisites
-- Requires-Python >=3.10
+
+### Packages
+- Python >=3.10 (Already in Ubuntu 24.04)
 - python3.10-venv
 - Terraform >=v1.11.1
 - kubectl
-```
-# Ubuntu 24.04
-apt install unzip -y
-apt install make -y
+- unzip
+- make
+
+We create a `.bin` directory within each cluster directory that will hold the binaries that are compatible with the current cluster version. This allows to have different clusters at different release versions.
+
+#### Add local binaries to PATH
+In order to make it easier to run the local binaries you can add them to your path in the current shell session by running this from the cluster directory.
 
 ```
+export BIN=${PWD}/.bin
+export PATH=${BIN}:${PATH}
 
+```
 
-**NOTE:** The brew installed Python works for Macs `brew install python@3.10`
-Ended up using pyenv on the Mac
+### OpenTofu Requirements
+#### Create S3 Bucket
+The S3 bucket will be used to store the OpenTofu state file remotely.
 
-
-
-
-### Create S3 Bucket
 - Give it a unique name
 - Enable `Block all public access`
 - Enable Bucket Versioning
 - Add Tags to know if this is important or not: `production` or `dev`
 - Default Encryption: Server-side encryption with Amazon S3 managed keys
 
-### Create access policy for Bucket
+#### Create access policy for Bucket
 
 - In the Resource URN replace BUCKET_NAME with the name of the S3 bucket from the previous step
 - This policy will allow a single account to access the OpenTofu state file of multiple clusters by allowing a directory structure:
@@ -45,7 +82,6 @@ Ended up using pyenv on the Mac
 │   │   |	└── terraform.tfstate
 │   │   |	└── terraform.tfstate.tflock
 ```
-
 
 IAM Policy:
 
@@ -84,13 +120,13 @@ IAM Policy:
 ```
 
 
-### Create AWS User
+#### Create AWS User
 - Give it a clear name like "customer name".
 - Leave console access unchecked.
 - Attach policies directly and pick the policy created above.
 - Take note of the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY of the new user.
 
-## Configure IaC files
+## GitOps Workflow
 
 The starting point is to copy the init directory into the new clusters directory
 
@@ -108,14 +144,12 @@ The starting point is to copy the init directory into the new clusters directory
 ```
 
 
-### Copy the base OpenTofu files to the new directory
+### Initialize the new cluster OpenTofu files
 
 ```
 # cd /etc/openCenter
 # cp -r infrastructure/init infrastructure/clusters/demo-cluster
 # mkdir -p applications/overlays/demo-cluster/managed-services/calico/helm-values
-
-
 # cd infrastructure/clusters/demo-cluster
 ```
 
@@ -171,19 +205,8 @@ export AWS_ACCESS_KEY_ID=<KEY>
 export AWS_SECRET_ACCESS_KEY=<KEY>
 ```
 
-## Install Terraform binary
-From within each cluster directory we want to install in a local .bin directory as there may be a case where newer clusters get deployed with a much newer and incompatible version.
 
-`make terraform`
-
-## Add terraform to PATH
-```
-export BIN=${PWD}/.bin
-export PATH=${BIN}:${PATH}
-
-```
-
-## Deploy IAC
+## Deploy Cluster
 
 ```
 # terraform init
@@ -200,16 +223,72 @@ If the init succeeds you are good to apply
 
 ## Use the cluster
 
-### Install the kubectl binary
-`make kubectl`
-
+### Kubeconfig
+A Kubeconfig file will be copied to the local cluster directory during the OpenTofu apply to provide access to the Kubernetes API.
 ```
 export KUBECONFIG=${PWD}/kubeconfig.yaml
 
 kubectl get nodes
 ```
+### Ansible
 
-# Infrastructure
+An ansible inventory file is created in the path `CLUSTER_DIR/inventory/inventory.yaml` that is pre-configured to use the bastion server allowing secure access into the virtual machine servers.
+
+
+
+## Post Deployment Steps
+### Deploy a CNI
+
+We deploy kubespray without a CNI to allow for the option of deploying any of the supported CNIs.
+
+```
+# helm repo add projectcalico https://docs.tigera.io/calico/charts
+# helm upgrade --install calico projectcalico/tigera-operator --namespace tigera-operator -f ../../../applications/overlays/demo-cluster/managed-services/calico/helm-values/override_values.yaml --create-namespace
+```
+
+### Complete the Hardening by deploying CSR Approver
+
+Part of the hardening configuration is to allow Kubelet to renew its certificates. To allow for the automatic renewal we need to deploy the `kubelet-csr-approver` by setting the hardening value `kubelet_rotate_server_certificates` to `true` in the cluster's `main.tf`
+
+**NOTE:** If the kubelet_rotate_server_certificates is true and the cluster doesnt have a CNI installed, the kubespray ansible playbook run will fail to deploy the `kubelet-csr-approver` helm chart.
+
+```
+ansible-playbook -f 10 -b upgrade-cluster.yml -e "@../inventory/k8s_hardening.yml"
+
+```
+
+### Bootstrap Flux
+
+#### Steps
+- A Git repository based on the openCenter-gitops-template.git
+- An SSH Key with Read permissions to the repository as deploy keys. Stored in PasswordSafe
+- Add public key as a deploy key to the repository
+- export KUBECONFIG variable
+- Install Flux curl flux.sh | kubectl apply -f -
+- Run the flux boostrap git command to initialize the repository using the ssh key
+- 
+
+
+# Outcome
+
+## Virtual Machines
+- Bastion Server
+- Control Plane Servers
+- Wroker Node Servers
+
+## Kubernetes Cluster
+
+```
+# kubectl get nodes
+NAME               STATUS   ROLES           AGE   VERSION
+demo-cluster-cp0   Ready    control-plane   17h   v1.31.4
+demo-cluster-cp1   Ready    control-plane   17h   v1.31.4
+demo-cluster-cp2   Ready    control-plane   17h   v1.31.4
+demo-cluster-wn0   Ready    <none>          17h   v1.31.4
+demo-cluster-wn1   Ready    <none>          17h   v1.31.4
+```
+
+# Infra Module Configuration Options
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -269,3 +348,9 @@ kubectl get nodes
 | windows_admin_password | string | ""  | Administrator password for Windows nodes |
 | worker_node_bfv_size_windows | number | 0   | Boot from volume size for Windows worker nodes |
 | worker_node_bfv_type_windows | string | "local" | Boot from volume type for Windows worker nodes |
+
+# To Do's:
+- Add support for app credentials auth
+- Document how to switch remote state teraform between S3 and Local
+- Review Git Tokens as a method of giving access to customer repo to Flux.
+- 
