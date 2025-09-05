@@ -353,4 +353,5 @@ demo-cluster-wn1   Ready    <none>          17h   v1.31.4
 - Add support for app credentials auth
 - Document how to switch remote state teraform between S3 and Local
 - Review Git Tokens as a method of giving access to customer repo to Flux.
-- 
+- Document upgrade process
+- Add Windows nodes to cluster
