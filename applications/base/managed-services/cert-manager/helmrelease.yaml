@@ -1,10 +1,11 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: envoy-gateway-api
-  namespace: envoy-gateway-system
+  name: cert-manager
+  namespace: cert-manager
 spec:
-  releaseName: envoy-gateway-api
+  releaseName: cert-manager
   interval: 5m
   timeout: 10m
   driftDetection:
@@ -17,20 +18,20 @@ spec:
     remediation:
       retries: 3
       remediateLastFailure: true
-  targetNamespace: envoy-gateway-system
+  targetNamespace: cert-manager
   chart:
     spec:
-      chart: gateway-helm
-      version: v0.0.0-latest
+      chart: cert-manager
+      version: v1.18.2
       sourceRef:
         kind: HelmRepository
-        name: envoyproxy
-        namespace: envoy-gateway-system
+        name: jetstack
+        namespace: flux-system
   valuesFrom:
     - kind: Secret
-      name: envoy-gateway-api-values-base
+      name: cert-manager-values
       valuesKey: hardened.yaml
     - kind: Secret
-      name: envoy-gateway-api-values-override
+      name: cert-manager-values
       valuesKey: override.yaml
       optional: true
