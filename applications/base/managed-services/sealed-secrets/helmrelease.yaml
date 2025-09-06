@@ -16,7 +16,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: sealed-secrets
-        namespace: flux-system
+        namespace: sealed-secrets
   valuesFrom:
     - kind: Secret
       name: sealed-secrets-values-base

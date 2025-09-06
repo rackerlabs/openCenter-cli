@@ -26,7 +26,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jetstack
-        namespace: flux-system
+        namespace: cert-manager
   valuesFrom:
     - kind: Secret
       name: cert-manager-values

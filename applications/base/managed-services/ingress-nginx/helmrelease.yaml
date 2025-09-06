@@ -25,7 +25,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: ingress-nginx
-        namespace: flux-system
+        namespace: ingress-nginx
   valuesFrom:
     - kind: Secret
       name: ingress-nginx-values-base

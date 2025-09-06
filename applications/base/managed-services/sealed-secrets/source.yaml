@@ -2,8 +2,6 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: sealed-secrets
-  namespace: flux-system
 spec:
-  url: oci://registry-1.docker.io/bitnamicharts
+  url: https://bitnami-labs.github.io/sealed-secrets
   interval: 1h
-  type: "oci"
