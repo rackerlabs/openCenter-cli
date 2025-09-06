@@ -5,9 +5,18 @@ metadata:
   namespace: ingress-nginx
 spec:
   releaseName: ingress-nginx
-  interval: 30s
+  interval: 5m
+  timeout: 10m
   driftDetection:
     mode: enabled
+  install:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
   targetNamespace: ingress-nginx
   chart:
     spec:
@@ -19,8 +28,9 @@ spec:
         namespace: flux-system
   valuesFrom:
     - kind: Secret
-      name: ingress-nginx-values
-      valuesKey: hardened_values_4.13.0.yaml
+      name: ingress-nginx-values-base
+      valuesKey: hardened.yaml
     - kind: Secret
-      name: ingress-nginx-values
-      valuesKey: override_values.yaml
+      name: ingress-nginx-values-override
+      valuesKey: override.yaml
+      optional: true
