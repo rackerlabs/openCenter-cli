@@ -29,9 +29,9 @@ spec:
         namespace: cert-manager
   valuesFrom:
     - kind: Secret
-      name: cert-manager-values
+      name: cert-manager-values-base
       valuesKey: hardened.yaml
     - kind: Secret
-      name: cert-manager-values
+      name: cert-manager-values-override
       valuesKey: override.yaml
       optional: true
