@@ -11,18 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+/*
+Package util provides utility functions for openCenter.
 
-import (
-	"os"
+This package contains helper functions that are used by other packages in the application.
 
-	"github.com/rackerlabs/openCenter/cmd"
-)
+When to use
 
-var version = "0.0.1"
-
-func main() {
-	if err := cmd.Execute(version); err != nil {
-		os.Exit(1)
-	}
-}
+This package is used internally by openCenter and is not intended for direct use by end-users.
+*/
+package util

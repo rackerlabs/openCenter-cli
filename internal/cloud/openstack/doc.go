@@ -11,18 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+/*
+Package openstack provides OpenStack-specific functionality.
 
-import (
-	"os"
+This package contains functions for performing preflight checks and other operations related to OpenStack.
 
-	"github.com/rackerlabs/openCenter/cmd"
-)
+When to use
 
-var version = "0.0.1"
-
-func main() {
-	if err := cmd.Execute(version); err != nil {
-		os.Exit(1)
-	}
-}
+This package is used internally by openCenter to ensure that the environment is correctly configured for OpenStack. It is invoked as part of the `cluster preflight` command.
+*/
+package openstack

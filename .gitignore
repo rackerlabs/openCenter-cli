@@ -74,3 +74,5 @@ godoc.log
 gitea/
 .gitea_admin_token
 .gitea_newuser_token
+testdata/
+tests/features/steps/tmp/

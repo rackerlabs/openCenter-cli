@@ -11,18 +11,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package openstack
 
 import (
-	"os"
-
-	"github.com/rackerlabs/openCenter/cmd"
+	"testing"
 )
 
-var version = "0.0.1"
+func TestPreflightOpenStack(t *testing.T) {
+	// Test with empty authURL
+	warnings := PreflightOpenStack("")
+	if len(warnings) != 2 {
+		t.Errorf("expected 2 warnings, but got %d", len(warnings))
+	}
 
-func main() {
-	if err := cmd.Execute(version); err != nil {
-		os.Exit(1)
+	// Test with non-empty authURL
+	warnings = PreflightOpenStack("http://keystone:5000")
+	if len(warnings) != 1 {
+		t.Errorf("expected 1 warning, but got %d", len(warnings))
 	}
 }

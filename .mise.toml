@@ -2,5 +2,37 @@
 golang = "1.24"
 kubectl = "1.34"
 kind = "0.30"
-flux = "2.6.4"
 helm = "3.18"
+
+[env]
+# Override the default config directory via environment for reproducible tests
+OPENCENTER_CONFIG_DIR = "./testdata/config"
+
+[tasks]
+# Build the openCenter binary
+build = "go build -o bin/openCenter"
+
+# Build the openCenter binary
+tidy = "go mod tidy"
+
+# Format all files to golang standards
+fmt = "gofmt -w ."
+
+# Run BDD tests via go test
+test = "go test ./internal/..."
+
+# Run BDD tests via godog CLI (optional)
+godog = "go test ./... -v args --godog.tags=~@wip --godog.paths=tests/features"
+
+# Generate the cluster JSON schema into the schema directory
+schema = "./bin/openCenter cluster schema --out schema/cluster.schema.json"
+
+# Convenience tasks for validation
+validate = "./bin/openCenter cluster validate"
+
+# Preflight task for preflight
+preflight = "./bin/openCenter cluster preflight"
+
+# Generate and view documentation
+doc = "go doc ./..."
+doc-serve = "go run golang.org/x/pkgsite/cmd/pkgsite@latest"

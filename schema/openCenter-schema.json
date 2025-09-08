@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "ansible": {
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "cloud": {
+      "properties": {
+        "openstack": {
+          "properties": {
+            "admin_password": {
+              "type": "string"
+            },
+            "auth_url": {
+              "type": "string"
+            },
+            "availability_zone": {
+              "type": "string"
+            },
+            "ca": {
+              "type": "string"
+            },
+            "disable_bastion": {
+              "type": "boolean"
+            },
+            "floatingip_pool": {
+              "type": "string"
+            },
+            "insecure": {
+              "type": "boolean"
+            },
+            "project_domain_name": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "router_external_network_id": {
+              "type": "string"
+            },
+            "tenant_name": {
+              "type": "string"
+            },
+            "user_domain_name": {
+              "type": "string"
+            },
+            "user_name": {
+              "type": "string"
+            },
+            "user_password": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "provider": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "cluster_name": {
+      "type": "string"
+    },
+    "gitops": {
+      "properties": {
+        "git_dir": {
+          "type": "string"
+        },
+        "git_ssh_key": {
+          "type": "string"
+        },
+        "git_url": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "kubernetes": {
+      "properties": {
+        "ca_certificates": {
+          "type": "string"
+        },
+        "counts": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "type": "object"
+        },
+        "flavors": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "images": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "k8s_api_port": {
+          "type": "integer"
+        },
+        "networking": {
+          "properties": {
+            "allocation_pool_end": {
+              "type": "string"
+            },
+            "allocation_pool_start": {
+              "type": "string"
+            },
+            "dns_nameservers": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "dns_zone_name": {
+              "type": "string"
+            },
+            "loadbalancer_provider": {
+              "type": "string"
+            },
+            "subnet_nodes": {
+              "type": "string"
+            },
+            "subnet_pods": {
+              "type": "string"
+            },
+            "subnet_services": {
+              "type": "string"
+            },
+            "use_designate": {
+              "type": "boolean"
+            },
+            "use_octavia": {
+              "type": "boolean"
+            },
+            "vlan": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "mtu": {
+                  "type": "integer"
+                },
+                "provider": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "vrrp_enabled": {
+              "type": "boolean"
+            },
+            "vrrp_ip": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "node_roles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "ssh_authorized_keys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ssh_user": {
+          "type": "string"
+        },
+        "storage": {
+          "properties": {
+            "master_node_bfv": {
+              "properties": {
+                "size": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "worker_node_bfv": {
+              "properties": {
+                "size": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "worker_node_bfv_windows": {
+              "properties": {
+                "size": {
+                  "type": "integer"
+                },
+                "type": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "type": "object"
+        },
+        "ub_version": {
+          "type": "string"
+        },
+        "windows": {
+          "properties": {
+            "admin_password": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "naming_prefix": {
+      "type": "string"
+    },
+    "terraform": {
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "cluster_name",
+    "gitops.git_dir"
+  ],
+  "title": "openCenter Cluster Configuration",
+  "type": "object"
+}

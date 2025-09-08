@@ -1,0 +1,16 @@
+{{- $root := . -}}
+{{- range $i, $e := until (int .Kubernetes.Counts.master) }}
+resource "null_resource" "master-{{ $i }}" {
+  provisioner "local-exec" {
+    command = "echo '{{ $root.ClusterName }}-master-{{ $i }}'"
+  }
+}
+{{- end }}
+
+{{- range $i, $e := until (int .Kubernetes.Counts.worker) }}
+resource "null_resource" "worker-{{ $i }}" {
+  provisioner "local-exec" {
+    command = "echo '{{ $root.ClusterName }}-worker-{{ $i }}'"
+  }
+}
+{{- end }}

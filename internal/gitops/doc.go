@@ -11,18 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+/*
+Package gitops provides functionality for managing GitOps templates.
 
-import (
-	"os"
+This package is responsible for copying and rendering embedded templates into the target GitOps repository. It uses Go's `embed` package to include the templates in the binary.
 
-	"github.com/rackerlabs/openCenter/cmd"
-)
+When to use
 
-var version = "0.0.1"
-
-func main() {
-	if err := cmd.Execute(version); err != nil {
-		os.Exit(1)
-	}
-}
+This package is used internally by openCenter to set up the GitOps repository for a cluster. It is invoked as part of the `cluster setup` command.
+*/
+package gitops

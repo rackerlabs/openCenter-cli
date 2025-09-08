@@ -11,18 +11,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package gitops
 
 import (
-	"os"
-
-	"github.com/rackerlabs/openCenter/cmd"
+	_ "embed"
+	"embed"
 )
 
-var version = "0.0.1"
-
-func main() {
-	if err := cmd.Execute(version); err != nil {
-		os.Exit(1)
-	}
-}
+// Files holds the embedded contents of the templates directory.
+//
+// The go:embed directive includes all files under the templates directory.
+// The embedded filesystem can be accessed using Files.ReadFile or Files.Open.
+// See copy.go for usage examples.
+//
+//go:embed all:templates
+var Files embed.FS

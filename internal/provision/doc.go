@@ -11,18 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+/*
+Package provision provides functionality for managing provisioning templates.
 
-import (
-	"os"
+This package is responsible for parsing and managing the embedded templates used for provisioning. It uses Go's `embed` package to include the templates in the binary.
 
-	"github.com/rackerlabs/openCenter/cmd"
-)
+When to use
 
-var version = "0.0.1"
-
-func main() {
-	if err := cmd.Execute(version); err != nil {
-		os.Exit(1)
-	}
-}
+This package is used internally by other packages in openCenter, such as the `ansible` and `terraform` packages, to execute provisioning templates. It is not intended for direct use by end-users.
+*/
+package provision

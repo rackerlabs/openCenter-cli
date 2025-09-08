@@ -1,0 +1,14 @@
+[master]
+{{- range $i, $e := until (int .Kubernetes.Counts.master) }}
+test-master-{{ $i }}
+{{- end }}
+
+[worker]
+{{- range $i, $e := until (int .Kubernetes.Counts.worker) }}
+test-worker-{{ $i }}
+{{- end }}
+
+[win_worker]
+{{- range $i, $e := until (int .Kubernetes.Counts.worker_windows) }}
+test-win-worker-{{ $i }}
+{{- end }}
