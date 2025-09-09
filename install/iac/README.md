@@ -37,6 +37,15 @@ The deployment node could be your laptop or an existing Linux VM.
   - [Virtual Machines](#virtual-machines)
   - [Kubernetes Cluster](#kubernetes-cluster)
 - [Infra Module Configuration Options](#infra-module-configuration-options)
+    - [openCenter](#opencenter)
+    - [gitops](#gitops)
+    - [Kubernetes](#kubernetes)
+      - [kubespray](#kubespray)
+      - [calico](#calico)
+      - [cilium](#cilium)
+      - [kube-ovn](#kube-ovn)
+      - [kube-ovn + celium](#kube-ovn--celium)
+    - [infra module](#infra-module)
 - [To Do's:](#to-dos)
 
 # openCenter Deployment Guide
@@ -148,6 +157,8 @@ The starting point is to copy the init directory into the new clusters directory
 
 ### Initialize the new cluster OpenTofu files
 
+**NOTE:** As of time of writing: The init files are expected to be in customer repo, where we really want them in the openCenter code repo. So for now you are going to have to copy the base terraform files manually from somewhere else or another cluster.
+
 ```
 # cd /etc/openCenter
 # cp -r infrastructure/init infrastructure/clusters/demo-cluster
@@ -245,7 +256,7 @@ We deploy kubespray without a CNI to allow for the option of deploying any of th
 
 ```
 # helm repo add projectcalico https://docs.tigera.io/calico/charts
-# helm upgrade --install calico projectcalico/tigera-operator --namespace tigera-operator -f ../../../applications/overlays/demo-cluster/services/calico/helm-values/override_values.yaml --create-namespace
+# helm upgrade --install calico projectcalico/tigera-operator --namespace tigera-operator -f ../../../applications/overlays/dev-cluster/services/calico/helm-values/override_values.yaml --create-namespace
 ```
 
 ### Complete the Hardening by deploying CSR Approver
@@ -263,6 +274,7 @@ Then
 
 ```
 export ANSIBLE_INVENTORY=${PWD}/inventory/inventory.yaml
+source venv/bin/activate
 cd kubespray
 ansible-playbook -f 10 -b upgrade-cluster.yml -e "@../inventory/k8s_hardening.yml"
 
