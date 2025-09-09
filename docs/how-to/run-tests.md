@@ -38,16 +38,31 @@ mise run godog
 
 This task executes the Godog test suite via `go test`. By default, it runs all `.feature` files in the `tests/features/` directory.
 
-### Running Specific Features
+### Running Specific Features or Tags
 
-The `godog` task can accept arguments passed to the underlying `go test` command. To run a specific feature, you can use the `--godog.paths` flag.
+The `godog` task accepts arguments passed to the underlying runner. You can:
 
-```bash
-# Run only the tests in the workflow.feature file
-mise run godog -- --godog.paths=tests/features/workflow.feature
-```
+- Run a specific feature file via paths:
+  ```bash
+  mise run godog -- --godog.paths=tests/features/gitops_setup.feature
+  ```
 
-Note the `--` which separates the `mise` command from the arguments being passed to the task.
+- Run by tag (recommended):
+  ```bash
+  # Only configuration flows (list/select/info/init/update)
+  mise run godog -- --godog.tags=@config
+
+  # Only GitOps flows (setup/bootstrap)
+  mise run godog -- --godog.tags=@gitops
+
+  # Only secrets/SOPS tests
+  mise run godog -- --godog.tags=@secrets
+
+  # Schema generation
+  mise run godog -- --godog.tags=@schema
+  ```
+
+Note the `--` which separates the `mise` command from arguments for the task.
 
 There is also a `test` task, which runs unit tests for the internal packages:
 ```bash
@@ -56,9 +71,16 @@ mise run test
 
 ### Understanding the Test Structure
 
-The tests are organized in the `tests/features/` directory:
+The tests are organized in the `tests/features/` directory by behavior:
 
-*   **`.feature` files**: These files contain the human-readable test scenarios written in Gherkin syntax (`Given`, `When`, `Then`). Each file typically corresponds to a specific feature of the CLI (e.g., `cluster_init.feature`, `gitops.feature`).
-*   **`steps/` directory**: This directory (`tests/features/steps/`) contains the Go code that implements the steps defined in the feature files. For example, when a test says `When I run "openCenter cluster list"`, the code in the `steps/` directory is what actually executes that command and captures its output.
+- `config_*.feature`: configuration flows (list/select/info/init/update)
+- `gitops_*.feature`: GitOps lifecycle (setup, bootstrap)
+- `wizard.feature`: interactive guided init
+- `schema.feature`: JSON schema generation
+- `secrets.feature` / `secrets_sops.feature`: SOPS/age helpers
+- `preflight.feature`: provider checks
+- `destroy.feature`: teardown safety
+
+The `tests/features/steps/` directory contains the Go step definitions used by all features.
 
 By reading the `.feature` files, you can get a clear understanding of what `openCenter` is designed to do and how it should behave in various situations.

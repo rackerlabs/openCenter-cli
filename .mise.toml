@@ -25,7 +25,7 @@ test = "go test ./internal/..."
 godog = "go test ./... -v args --godog.tags=~@wip --godog.paths=tests/features"
 
 # Generate the cluster JSON schema into the schema directory
-schema = "./bin/openCenter cluster schema --out schema/cluster.schema.json"
+schema = "./bin/openCenter cluster schema  --pretty --out schema/cluster.schema.json"
 
 # Convenience tasks for validation
 validate = "./bin/openCenter cluster validate"
@@ -52,10 +52,16 @@ gitea-configure = [
   "./hack/gitea-local/configure-gitea-user-tokens.sh"
 ]
 
+# Start and configure local Gitea for testing (setup → configure)
+gitea-up = [
+  "mise run gitea-setup",
+  "mise run gitea-configure"
+]
+
 gitea-cleanup = [
   "echo Cleaning up local git...",
   "./hack/gitea-local/setup-gitea.sh destroy -y",
-  "rm -f .gitea_admin_token .gitea_newuser_token"
+  "rm -f .gitea_admin_token .gitea_newuser_token .gitea_newuser_id_ed25519 .gitea_newuser_id_ed25519.pub"
 ]
 
 clean = [
