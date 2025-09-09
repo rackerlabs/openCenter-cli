@@ -1,17 +1,18 @@
+---
 ## @section Common parameters
 
 ## @param kubeVersion Override Kubernetes version
 ##
-kubeVersion: ""
+kubeVersion: ''
 ## @param nameOverride String to partially override sealed-secrets.fullname
 ##
-nameOverride: ""
+nameOverride: ''
 ## @param fullnameOverride String to fully override sealed-secrets.fullname
 ##
-fullnameOverride: ""
+fullnameOverride: ''
 ## @param namespace Namespace where to deploy the Sealed Secrets controller
 ##
-namespace: ""
+namespace: ''
 
 ## @param extraDeploy [array] Array of extra objects to deploy with the release
 ##
@@ -55,13 +56,13 @@ image:
   pullSecrets: []
 ## @param revisionHistoryLimit Number of old history to retain to allow rollback (If not set, default Kubernetes value is set to 10)
 ## e.g:
-revisionHistoryLimit: ""
+revisionHistoryLimit: ''
 ## @param createController Specifies whether the Sealed Secrets controller should be created
 ##
 createController: true
 ## @param secretName The name of an existing TLS secret containing the key used to encrypt secrets
 ##
-secretName: "sealed-secrets-key"
+secretName: sealed-secrets-key
 ## @param updateStatus Specifies whether the Sealed Secrets controller should update the status subresource
 ##
 updateStatus: true
@@ -76,24 +77,24 @@ skipRecreate: false
 ## keyrenewperiod: "720h30m"
 ## To disable use "0", with quotes!
 ##
-keyrenewperiod: ""
+keyrenewperiod: ''
 ## @param keyttl Specifies the certificate validity duration. Default 10 years.
 ## e.g for one year
 ## keyttl: "8760h00m00s"
 ##
-keyttl: ""
+keyttl: ''
 ## @param keycutofftime Specifies a date at which the controller should generate a new certificate. Useful in early key renewal scenarios.
 ## Takes a date formated according to RFC1123. Can be obtained with the 'date -R' command on a unix system.
 ## e.g
 ## keycutofftime: "Mon, 14 Oct 2024 21:45:30 +0200"
 ##
-keycutofftime: ""
+keycutofftime: ''
 ## @param rateLimit Number of allowed sustained request per second for verify endpoint
 ##
-rateLimit: ""
+rateLimit: ''
 ## @param rateLimitBurst Number of requests allowed to exceed the rate limit per second for verify endpoint
 ##
-rateLimitBurst: ""
+rateLimitBurst: ''
 ## @param additionalNamespaces List of namespaces used to manage the Sealed Secrets
 ##
 additionalNamespaces: []
@@ -108,13 +109,13 @@ privateKeyLabels: {}
 logInfoStdout: false
 ## @param logLevel Specifies log level of controller (INFO,ERROR)
 ##
-logLevel: ""
+logLevel: ''
 ## @param logFormat Specifies log format (text,json)
 ##
-logFormat: ""
+logFormat: ''
 ## @param maxRetries Number of maximum retries
 ##
-maxRetries: ""
+maxRetries: ''
 ## @param command Override default container command
 ##
 command: []
@@ -207,7 +208,6 @@ containerSecurityContext:
   capabilities:
     drop:
       - ALL
-
 ## @param podLabels [object] Extra labels for Sealed Secret pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
@@ -218,10 +218,10 @@ podLabels: {}
 podAnnotations: {}
 ## @param priorityClassName Sealed Secret pods' priorityClassName
 ##
-priorityClassName: ""
+priorityClassName: ''
 ## @param runtimeClassName Sealed Secret pods' runtimeClassName
 ##
-runtimeClassName: ""
+runtimeClassName: ''
 ## @param affinity [object] Affinity for Sealed Secret pods assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ##
@@ -258,11 +258,10 @@ containerPorts:
 ## @param hostPorts.metrics Metrics HTTP Port on the Host
 ##
 hostPorts:
-  http: ""
-  metrics: ""
-
+  http: ''
+  metrics: ''
 ## @param dnsPolicy Sealed Secrets pods' dnsPolicy
-dnsPolicy: ""
+dnsPolicy: ''
 ## @section Traffic Exposure Parameters
 
 ## Sealed Secret service parameters
@@ -273,7 +272,7 @@ service:
   type: ClusterIP
   ## @param service.loadBalancerClass Sealed Secret service loadBalancerClass
   ##
-  loadBalancerClass: ""
+  loadBalancerClass: ''
   ## @param service.port Sealed Secret service HTTP port
   ##
   port: 8080
@@ -282,7 +281,7 @@ service:
   ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
   ## NOTE: choose port between <30000-32767>
   ##
-  nodePort: ""
+  nodePort: ''
   ## @param service.annotations [object] Additional custom annotations for Sealed Secret service
   ##
   annotations: {}
@@ -298,12 +297,12 @@ ingress:
   pathType: ImplementationSpecific
   ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
   ##
-  apiVersion: ""
+  apiVersion: ''
   ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress
   ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster.
   ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
   ##
-  ingressClassName: ""
+  ingressClassName: ''
   ## @param ingress.hostname Default host for the ingress record
   ##
   hostname: sealed-secrets.local
@@ -390,11 +389,10 @@ networkPolicy:
     enabled: false
     ## @param networkPolicy.egress.kubeapiCidr Specifies the kubeapiCidr, which is the only egress allowed. If not set, kubeapiCidr will be found using Helm lookup
     ##
-    kubeapiCidr: ""
+    kubeapiCidr: ''
     ## @param networkPolicy.egress.kubeapiPort Specifies the kubeapiPort, which is the only egress allowed. If not set, kubeapiPort will be found using Helm lookup
     ##
-    kubeapiPort: ""
-
+    kubeapiPort: ''
 ## @section Other Parameters
 
 ## ServiceAccount configuration
@@ -413,7 +411,7 @@ serviceAccount:
   ## @param serviceAccount.name The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the sealed-secrets.fullname template
   ##
-  name: ""
+  name: ''
 ## RBAC configuration
 ##
 rbac:
@@ -425,13 +423,13 @@ rbac:
   clusterRole: true
   ## @param rbac.clusterRoleName Specifies the name for the Cluster Role resource
   ##
-  clusterRoleName: "secrets-unsealer"
+  clusterRoleName: secrets-unsealer
   ## @param rbac.namespacedRoles Specifies whether the namespaced Roles should be created (in each of the specified additionalNamespaces)
   ##
   namespacedRoles: false
   ## @param rbac.namespacedRolesName Specifies the name for the namespaced Role resource
   ##
-  namespacedRolesName: "secrets-unsealer"
+  namespacedRolesName: secrets-unsealer
   ## @param rbac.labels Extra labels to be added to RBAC resources
   ##
   labels: {}
@@ -466,7 +464,7 @@ metrics:
     enabled: false
     ## @param metrics.serviceMonitor.namespace Namespace where Prometheus Operator is running in
     ##
-    namespace: ""
+    namespace: ''
     ## @param metrics.serviceMonitor.labels Extra labels for the ServiceMonitor
     ##
     labels: {}
@@ -477,12 +475,12 @@ metrics:
     ## e.g:
     ## interval: 10s
     ##
-    interval: ""
+    interval: ''
     ## @param metrics.serviceMonitor.scrapeTimeout Timeout after which the scrape is ended
     ## e.g:
     ## scrapeTimeout: 10s
     ##
-    scrapeTimeout: ""
+    scrapeTimeout: ''
     ## @param metrics.serviceMonitor.honorLabels Specify if ServiceMonitor endPoints will honor labels
     ##
     honorLabels: true
@@ -507,7 +505,7 @@ metrics:
     annotations: {}
     ## @param metrics.dashboards.namespace Namespace where Grafana dashboard ConfigMap is deployed
     ##
-    namespace: ""
+    namespace: ''
 
   ## Sealed Secret Metrics service parameters
   ##
@@ -517,7 +515,7 @@ metrics:
     type: ClusterIP
     ## @param metrics.service.loadBalancerClass Sealed Secret Metrics service loadBalancerClass
     ##
-    loadBalancerClass: ""
+    loadBalancerClass: ''
     ## @param metrics.service.port Sealed Secret service Metrics HTTP port
     ##
     port: 8081
@@ -526,7 +524,7 @@ metrics:
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
     ## NOTE: choose port between <30000-32767>
     ##
-    nodePort: ""
+    nodePort: ''
     ## @param metrics.service.annotations [object] Additional custom annotations for Sealed Secret Metrics service
     ##
     annotations: {}
@@ -542,4 +540,4 @@ pdb:
   minAvailable: 1
   ## @param pdb.maxUnavailable The maximum number of unavailable pods (non number to omit)
   ##
-  maxUnavailable: ""
+  maxUnavailable: ''
