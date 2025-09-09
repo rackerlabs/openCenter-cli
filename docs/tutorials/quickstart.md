@@ -61,6 +61,10 @@ The `cluster init` command creates a new YAML configuration file with sensible d
 
 This command creates a new file at `~/.config/openCenter/demo.yaml`. This file is the single source of truth for your cluster.
 
+Tip
+- If `secrets.sops_age_key_file` is not set in your config at init-time, `openCenter` automatically generates a SOPS age key at `~/.config/openCenter/sops/age/keys/demo-key.txt` (permissions `0600`) and saves the updated path into the config. You can replace this key later with one produced by `age-keygen` if desired.
+ - To disable auto-generation, pass `--no-sops-keygen` to the init command.
+
 ### Step 4: Configure and Validate
 
 The default configuration needs a few more details before it's ready.
@@ -78,10 +82,10 @@ The default configuration needs a few more details before it's ready.
 
 2.  **Configure Networking**: For this tutorial, we will configure the cluster to use VRRP for the control plane load balancer instead of Octavia. This requires a specific IP address.
 
-    Update the `kubernetes.networking` section in your `demo.yaml`:
+    Update the `iac.networking` section in your `demo.yaml`:
     ```yaml
     # ~/.config/openCenter/demo.yaml
-    kubernetes:
+    iac:
       # ...
       networking:
         use_octavia: false
@@ -99,14 +103,14 @@ The default configuration needs a few more details before it's ready.
     Because `vrrp_ip` is required when `use_octavia` is `false`, the command will fail with a helpful error message:
 
     ```text
-    [ERROR] kubernetes.networking.use_octavia=false requires vrrp_ip to be set
+    [ERROR] iac.networking.use_octavia=false requires vrrp_ip to be set
     ```
 
 4.  **Fix and Re-validate**: Now, edit `demo.yaml` again and provide a valid IP address for `vrrp_ip`.
 
     ```yaml
     # ~/.config/openCenter/demo.yaml
-    kubernetes:
+    iac:
       # ...
       networking:
         use_octavia: false

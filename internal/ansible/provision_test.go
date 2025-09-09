@@ -36,8 +36,8 @@ func TestProvision(t *testing.T) {
 	dir := t.TempDir()
 	cfg := config.NewDefault("test")
 	cfg.GitOps.GitDir = dir
-	cfg.Kubernetes.Counts["master"] = 1
-	cfg.Kubernetes.Counts["worker"] = 2
+    cfg.IAC.Counts["master"] = 1
+    cfg.IAC.Counts["worker"] = 2
 
 	if err := Provision(cfg); err != nil {
 		t.Fatal(err)

@@ -36,14 +36,35 @@ func GenerateSchema(pretty bool) ([]byte, error) {
         "title":   "openCenter Cluster Configuration",
         "type":    "object",
         "properties": map[string]any{
+            // Legacy top-levels retained
             "cluster_name": map[string]any{"type": "string"},
             "naming_prefix": map[string]any{"type": "string"},
+
+            // New: cluster metadata (optional)
+            "cluster": map[string]any{
+                "type":       "object",
+                "properties": map[string]any{
+                    "name":   map[string]any{"type": "string"},
+                    "env":    map[string]any{"type": "string"},
+                    "region": map[string]any{"type": "string"},
+                    "status": map[string]any{"type": "string"},
+                },
+            },
             "gitops": map[string]any{
                 "type":       "object",
                 "properties": map[string]any{
                     "git_dir":    map[string]any{"type": "string"},
                     "git_url":    map[string]any{"type": "string"},
                     "git_ssh_key": map[string]any{"type": "string"},
+                    // New fields
+                    "git_branch": map[string]any{"type": "string"},
+                    "flux": map[string]any{
+                        "type":       "object",
+                        "properties": map[string]any{
+                            "interval": map[string]any{"type": "string"},
+                            "prune":    map[string]any{"type": "boolean"},
+                        },
+                    },
                 },
             },
             "terraform": map[string]any{
@@ -58,11 +79,23 @@ func GenerateSchema(pretty bool) ([]byte, error) {
                 "properties": map[string]any{
                     "enabled": map[string]any{"type": "boolean"},
                     "path":    map[string]any{"type": "string"},
+                    // New fields
+                    "inventory": map[string]any{"type": "string"},
+                    "playbooks": map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
                 },
             },
-            "kubernetes": map[string]any{
+            // Renamed: top-level 'kubernetes' → 'iac'
+            "iac": map[string]any{
                 "type":       "object",
                 "properties": map[string]any{
+                    // New IAC engine selectors
+                    "engine":  map[string]any{"type": "string"}, // pulumi | terraform
+                    "stack":   map[string]any{"type": "string"}, // Pulumi stack or TF workspace
+                    "version": map[string]any{"type": "string"},
+                    "cni":     map[string]any{"type": "string"},
+                    "ingress": map[string]any{"type": "string"},
+
+                    // Detailed fields retained from previous Kubernetes structure
                     "ssh_user":           map[string]any{"type": "string"},
                     "k8s_api_port":       map[string]any{"type": "integer"},
                     "ub_version":         map[string]any{"type": "string"},
@@ -137,8 +170,30 @@ func GenerateSchema(pretty bool) ([]byte, error) {
                             "router_external_network_id": map[string]any{"type": "string"},
                             "disable_bastion":     map[string]any{"type": "boolean"},
                             "ca":                  map[string]any{"type": "string"},
+                            // New convenience aliases
+                            "external_network":    map[string]any{"type": "string"},
+                            "use_octavia":         map[string]any{"type": "boolean"},
+                            "vrrp_ip":             map[string]any{"type": "string"},
                         },
                     },
+                    // New: AWS provider shape (optional)
+                    "aws": map[string]any{
+                        "type": "object",
+                        "properties": map[string]any{
+                            "profile":         map[string]any{"type": "string"},
+                            "region":          map[string]any{"type": "string"},
+                            "vpc_id":          map[string]any{"type": "string"},
+                            "private_subnets": map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
+                            "public_subnets":  map[string]any{"type": "array", "items": map[string]any{"type": "string"}},
+                        },
+                    },
+                },
+            },
+            // New: secrets configuration
+            "secrets": map[string]any{
+                "type":       "object",
+                "properties": map[string]any{
+                    "sops_age_key_file": map[string]any{"type": "string"},
                 },
             },
         },

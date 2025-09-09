@@ -95,7 +95,7 @@ Feature: openCenter cluster basics
       """
     When I run "openCenter cluster validate demo --config-dir <<tmp>>/conf"
     Then exit code should be 1
-    And stderr should contain "kubernetes.networking.use_octavia=true and vrrp_enabled=true are mutually exclusive"
+    And stderr should contain "iac.networking.use_octavia=true and vrrp_enabled=true are mutually exclusive"
 
   Scenario: Preflight
     Given a file "<<tmp>>/conf/demo.yaml" with content:

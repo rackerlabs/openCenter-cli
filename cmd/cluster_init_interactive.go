@@ -24,9 +24,12 @@ import (
 
 func runInitInteractive(cfg *config.Config) error {
 	// Handlers for complex types
-	k8sApiPort := fmt.Sprintf("%d", cfg.Kubernetes.K8sAPIPort)
-	sshAuthKeys := strings.Join(cfg.Kubernetes.SSHAuthorizedKeys, "\n")
-	dnsNameservers := strings.Join(cfg.Kubernetes.Networking.DNSNameservers, "\n")
+    k8sApiPort := fmt.Sprintf("%d", cfg.IAC.K8sAPIPort)
+    sshAuthKeys := strings.Join(cfg.IAC.SSHAuthorizedKeys, "\n")
+    dnsNameservers := strings.Join(cfg.IAC.Networking.DNSNameservers, "\n")
+    ansiblePlaybooks := strings.Join(cfg.Ansible.Playbooks, "\n")
+    sopsKeyPath := cfg.Secrets.SopsAgeKeyFile
+    verifyNow := true
 
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -43,18 +46,30 @@ func runInitInteractive(cfg *config.Config) error {
 
 		huh.NewGroup(
 			huh.NewNote().Title("GitOps Configuration"),
-			huh.NewInput().
-				Title("Git Directory").
-				Description("Local directory for GitOps repository.").
-				Value(&cfg.GitOps.GitDir),
-			huh.NewInput().
-				Title("Git URL").
-				Description("URL of the GitOps repository.").
-				Value(&cfg.GitOps.GitURL),
-			huh.NewInput().
-				Title("Git SSH Key").
-				Description("Path to the SSH key for Git access.").
-				Value(&cfg.GitOps.GitSSHKey),
+            huh.NewInput().
+                Title("Git Directory").
+                Description("Local directory for GitOps repository.").
+                Value(&cfg.GitOps.GitDir),
+            huh.NewInput().
+                Title("Git URL").
+                Description("URL of the GitOps repository.").
+                Value(&cfg.GitOps.GitURL),
+            huh.NewInput().
+                Title("Git SSH Key").
+                Description("Path to the SSH key for Git access.").
+                Value(&cfg.GitOps.GitSSHKey),
+            huh.NewInput().
+                Title("Git Branch").
+                Description("Branch to push to (defaults to 'main' if empty).").
+                Value(&cfg.GitOps.GitBranch),
+            huh.NewInput().
+                Title("Flux Interval").
+                Description("Optional reconciliation interval (e.g., 1m).").
+                Value(&cfg.GitOps.Flux.Interval),
+            huh.NewConfirm().
+                Title("Flux Prune").
+                Description("Enable Flux prune (optional).").
+                Value(&cfg.GitOps.Flux.Prune),
 		),
 
 		huh.NewGroup(
@@ -73,18 +88,26 @@ func runInitInteractive(cfg *config.Config) error {
 			huh.NewConfirm().
 				Title("Enable Ansible").
 				Value(&cfg.Ansible.Enabled),
-			huh.NewInput().
-				Title("Ansible Path").
-				Description("Path to Ansible configuration files.").
-				Value(&cfg.Ansible.Path),
+            huh.NewInput().
+                Title("Ansible Path").
+                Description("Path to Ansible configuration files.").
+                Value(&cfg.Ansible.Path),
+            huh.NewInput().
+                Title("Ansible Inventory").
+                Description("Optional inventory filename or path.").
+                Value(&cfg.Ansible.Inventory),
+            huh.NewText().
+                Title("Ansible Playbooks").
+                Description("Optional playbooks, one per line.").
+                Value(&ansiblePlaybooks),
 		),
 
 		huh.NewGroup(
-			huh.NewNote().Title("Kubernetes General"),
+            huh.NewNote().Title("IAC / Kubernetes General"),
 			huh.NewInput().
 				Title("SSH User").
 				Description("SSH username for nodes.").
-				Value(&cfg.Kubernetes.SSHUser),
+                Value(&cfg.IAC.SSHUser),
 			huh.NewInput().
 				Title("API Port").
 				Description("Kubernetes API server port.").
@@ -92,7 +115,7 @@ func runInitInteractive(cfg *config.Config) error {
 			huh.NewInput().
 				Title("Ubuntu Version").
 				Description("Version of Ubuntu for nodes.").
-				Value(&cfg.Kubernetes.UBVersion),
+                Value(&cfg.IAC.UBVersion),
 			huh.NewText().
 				Title("SSH Authorized Keys").
 				Description("Public SSH keys to authorize, one per line.").
@@ -100,43 +123,56 @@ func runInitInteractive(cfg *config.Config) error {
 		),
 
 		huh.NewGroup(
-			huh.NewNote().Title("Kubernetes Networking"),
+            huh.NewNote().Title("IAC / Kubernetes Networking"),
 			huh.NewInput().
 				Title("Nodes Subnet").
 				Description("CIDR for the nodes subnet.").
-				Value(&cfg.Kubernetes.Networking.SubnetNodes),
+                Value(&cfg.IAC.Networking.SubnetNodes),
 			huh.NewInput().
 				Title("Services Subnet").
 				Description("CIDR for the services subnet.").
-				Value(&cfg.Kubernetes.Networking.SubnetServices),
+                Value(&cfg.IAC.Networking.SubnetServices),
 			huh.NewInput().
 				Title("Pods Subnet").
 				Description("CIDR for the pods subnet.").
-				Value(&cfg.Kubernetes.Networking.SubnetPods),
+                Value(&cfg.IAC.Networking.SubnetPods),
 			huh.NewConfirm().
 				Title("Enable Octavia").
 				Description("Use Octavia for load balancing.").
-				Value(&cfg.Kubernetes.Networking.UseOctavia),
+                Value(&cfg.IAC.Networking.UseOctavia),
 			huh.NewSelect[string]().
 				Title("Load Balancer Provider").
 				Options(huh.NewOptions("amphora", "ovn")...).
-				Value(&cfg.Kubernetes.Networking.LoadbalancerProvider),
+                Value(&cfg.IAC.Networking.LoadbalancerProvider),
 		),
 
-		huh.NewGroup(
-			huh.NewNote().Title("Kubernetes DNS"),
+	huh.NewGroup(
+            huh.NewNote().Title("IAC / DNS"),
 			huh.NewConfirm().
 				Title("Enable Designate").
 				Description("Use Designate for DNS services.").
-				Value(&cfg.Kubernetes.Networking.UseDesignate),
+                Value(&cfg.IAC.Networking.UseDesignate),
 			huh.NewInput().
 				Title("DNS Zone Name").
 				Description("Name of the DNS zone.").
-				Value(&cfg.Kubernetes.Networking.DNSZoneName),
+                Value(&cfg.IAC.Networking.DNSZoneName),
 			huh.NewText().
 				Title("DNS Nameservers").
 				Description("List of DNS nameservers, one per line.").
 				Value(&dnsNameservers),
+	),
+
+		// Secrets and optional verification
+		huh.NewGroup(
+			huh.NewNote().Title("Secrets & Verification"),
+			huh.NewInput().
+				Title("SOPS Age Key File").
+				Description("Optional path. Leave empty to auto-generate on save.").
+				Value(&sopsKeyPath),
+			huh.NewConfirm().
+				Title("Verify configuration now").
+				Description("Run validation and review results before saving.").
+				Value(&verifyNow),
 		),
 		huh.NewGroup(
 			huh.NewNote().Title("Cloud Provider"),
@@ -152,11 +188,22 @@ func runInitInteractive(cfg *config.Config) error {
 	}
 
 	// Post-processing for complex types
-	if port, err := strconv.Atoi(k8sApiPort); err == nil {
-		cfg.Kubernetes.K8sAPIPort = port
-	}
-	cfg.Kubernetes.SSHAuthorizedKeys = strings.Split(sshAuthKeys, "\n")
-	cfg.Kubernetes.Networking.DNSNameservers = strings.Split(dnsNameservers, "\n")
+    if port, err := strconv.Atoi(k8sApiPort); err == nil {
+        cfg.IAC.K8sAPIPort = port
+    }
+    cfg.IAC.SSHAuthorizedKeys = strings.Split(sshAuthKeys, "\n")
+    cfg.IAC.Networking.DNSNameservers = strings.Split(dnsNameservers, "\n")
+    if strings.TrimSpace(ansiblePlaybooks) != "" {
+        var pbs []string
+        for _, line := range strings.Split(ansiblePlaybooks, "\n") {
+            line = strings.TrimSpace(line)
+            if line != "" {
+                pbs = append(pbs, line)
+            }
+        }
+        cfg.Ansible.Playbooks = pbs
+    }
+    cfg.Secrets.SopsAgeKeyFile = strings.TrimSpace(sopsKeyPath)
 
 	if !cfg.Terraform.Enabled {
 		cfg.Terraform.Path = ""
@@ -164,9 +211,31 @@ func runInitInteractive(cfg *config.Config) error {
 	if !cfg.Ansible.Enabled {
 		cfg.Ansible.Path = ""
 	}
-	if !cfg.Kubernetes.Networking.UseDesignate {
-		cfg.Kubernetes.Networking.DNSZoneName = ""
-	}
+    if !cfg.IAC.Networking.UseDesignate {
+        cfg.IAC.Networking.DNSZoneName = ""
+    }
+
+    // Optional verification step
+    if verifyNow {
+        errs := config.Validate(*cfg)
+        summary := "Validation successful."
+        if len(errs) > 0 {
+            summary = fmt.Sprintf("Validation found %d issue(s):\n- %s", len(errs), strings.Join(errs, "\n- "))
+        }
+        proceed := true
+        vf := huh.NewForm(
+            huh.NewGroup(
+                huh.NewNote().Title("Verification Results").Description(summary),
+                huh.NewConfirm().Title("Proceed to save configuration?").Value(&proceed),
+            ),
+        )
+        if err := vf.Run(); err != nil {
+            return fmt.Errorf("verification form failed: %w", err)
+        }
+        if !proceed {
+            return fmt.Errorf("aborted by user after verification")
+        }
+    }
 
 	return nil
 }

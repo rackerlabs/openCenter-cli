@@ -136,7 +136,7 @@ Feature: CLI core flows and validations
   Scenario: Non-interactive init fails with --strict when required values missing
     When I run "openCenter cluster init bad --strict"
     Then the exit code should not be 0
-    And stderr should contain "kubernetes.networking.use_designate=true requires dns_zone_name to be set"
+    And stderr should contain "iac.networking.use_designate=true requires dns_zone_name to be set"
 
   # ---------------------------------------------------------------------------
   # SETUP (materialization, idempotency, forced overwrite)
@@ -210,7 +210,7 @@ Feature: CLI core flows and validations
       """
     When I run "openCenter cluster info bad-octavia-vrrp --validate"
     Then the exit code should not be 0
-    And stderr should contain "kubernetes.networking.use_octavia=true and vrrp_enabled=true are mutually exclusive"
+    And stderr should contain "iac.networking.use_octavia=true and vrrp_enabled=true are mutually exclusive"
 
   @validate @vrrp_missing_ip
   Scenario: use_octavia=false and missing vrrp_ip -> error
@@ -228,7 +228,7 @@ Feature: CLI core flows and validations
       """
     When I run "openCenter cluster info bad-vrrp-ip --validate"
     Then the exit code should not be 0
-    And stderr should contain "kubernetes.networking.use_octavia=false requires vrrp_ip to be set"
+    And stderr should contain "iac.networking.use_octavia=false requires vrrp_ip to be set"
 
   @validate @designate_missing_zone
   Scenario: use_designate=true and missing dns_zone_name -> error
@@ -247,7 +247,7 @@ Feature: CLI core flows and validations
       """
     When I run "openCenter cluster info bad-designate --validate"
     Then the exit code should not be 0
-    And stderr should contain "kubernetes.networking.use_designate=true requires dns_zone_name to be set"
+    And stderr should contain "iac.networking.use_designate=true requires dns_zone_name to be set"
 
   @validate @counts_without_flavors
   Scenario Outline: Node counts > 0 require corresponding flavors
@@ -262,7 +262,7 @@ Feature: CLI core flows and validations
       """
     When I run "openCenter cluster info <name> --validate"
     Then the exit code should not be 0
-    And stderr should contain "kubernetes.counts.<role> > 0 requires kubernetes.flavors.<role> to be set"
+    And stderr should contain "iac.counts.<role> > 0 requires iac.flavors.<role> to be set"
 
     Examples:
       | name           | role   | count |

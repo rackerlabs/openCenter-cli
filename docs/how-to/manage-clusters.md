@@ -66,7 +66,7 @@ Like the `list` command, `info` also supports JSON output, which is useful for p
 
 ```bash
 # Get the full configuration as a JSON object
-./openCenter cluster info dev --json | jq .kubernetes.networking
+./openCenter cluster info dev --json | jq .iac.networking
 ```
 
 ### Selecting an Active Cluster

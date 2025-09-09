@@ -38,13 +38,23 @@ import (
 //
 // See docs/ARCHITECTURE.md for a complete description of the data model.
 type Config struct {
-    ClusterName   string        `yaml:"cluster_name" json:"cluster_name"`
-    NamingPrefix  string        `yaml:"naming_prefix,omitempty" json:"naming_prefix,omitempty"`
-    GitOps        GitOpsConfig  `yaml:"gitops" json:"gitops"`
-    Terraform     Terraform     `yaml:"terraform" json:"terraform"`
-    Ansible       Ansible       `yaml:"ansible" json:"ansible"`
-    Kubernetes    Kubernetes    `yaml:"kubernetes" json:"kubernetes"`
-    Cloud         Cloud         `yaml:"cloud" json:"cloud"`
+    ClusterName   string       `yaml:"cluster_name" json:"cluster_name"`
+    NamingPrefix  string       `yaml:"naming_prefix,omitempty" json:"naming_prefix,omitempty"`
+    Cluster       ClusterMeta  `yaml:"cluster,omitempty" json:"cluster,omitempty"`
+    GitOps        GitOpsConfig `yaml:"gitops" json:"gitops"`
+    Terraform     Terraform    `yaml:"terraform" json:"terraform"`
+    Ansible       Ansible      `yaml:"ansible" json:"ansible"`
+    IAC           IAC          `yaml:"iac" json:"iac"`
+    Cloud         Cloud        `yaml:"cloud" json:"cloud"`
+    Secrets       Secrets      `yaml:"secrets" json:"secrets"`
+}
+
+// ClusterMeta holds high-level metadata about the cluster.
+type ClusterMeta struct {
+    Name   string `yaml:"name" json:"name"`
+    Env    string `yaml:"env" json:"env"`
+    Region string `yaml:"region" json:"region"`
+    Status string `yaml:"status" json:"status"`
 }
 
 // Terraform holds Terraform-specific settings.
@@ -55,21 +65,41 @@ type Terraform struct {
 
 // Ansible holds Ansible-specific settings.
 type Ansible struct {
-    Enabled bool   `yaml:"enabled" json:"enabled"`
-    Path    string `yaml:"path" json:"path"`
+    Enabled   bool     `yaml:"enabled" json:"enabled"`
+    Path      string   `yaml:"path" json:"path"`
+    Inventory string   `yaml:"inventory,omitempty" json:"inventory,omitempty"`
+    Playbooks []string `yaml:"playbooks,omitempty" json:"playbooks,omitempty"`
 }
 
 // GitOpsConfig holds configuration related to GitOps scaffolding and repositories.
 type GitOpsConfig struct {
-    GitDir    string `yaml:"git_dir" json:"git_dir"`
-    GitURL    string `yaml:"git_url" json:"git_url"`
-    GitSSHKey string `yaml:"git_ssh_key,omitempty" json:"git_ssh_key,omitempty"`
+    GitDir     string     `yaml:"git_dir" json:"git_dir"`
+    GitURL     string     `yaml:"git_url" json:"git_url"`
+    GitSSHKey  string     `yaml:"git_ssh_key,omitempty" json:"git_ssh_key,omitempty"`
+    GitBranch  string     `yaml:"git_branch,omitempty" json:"git_branch,omitempty"`
+    Flux       GitOpsFlux `yaml:"flux,omitempty" json:"flux,omitempty"`
+}
+
+// GitOpsFlux holds optional FluxCD settings for reconciliation behavior.
+type GitOpsFlux struct {
+    Interval string `yaml:"interval" json:"interval"`
+    Prune    bool   `yaml:"prune" json:"prune"`
 }
 
 // Kubernetes groups settings for the Kubernetes cluster.
 // It nests further objects for counts, images, flavors, and networking.
 // Default values are applied at load time.
-type Kubernetes struct {
+// IAC groups settings for infrastructure-as-code driven cluster provisioning.
+// It retains the detailed node/layout fields and adds engine/stack selectors.
+type IAC struct {
+    // New fields for engine selection
+    Engine string `yaml:"engine" json:"engine"`
+    Stack  string `yaml:"stack" json:"stack"`
+    // Optional high-level k8s selectors
+    Version string `yaml:"version" json:"version"`
+    CNI     string `yaml:"cni" json:"cni"`
+    Ingress string `yaml:"ingress" json:"ingress"`
+    // Detailed fields retained from previous Kubernetes struct
     SSHUser           string            `yaml:"ssh_user" json:"ssh_user"`
     K8sAPIPort        int               `yaml:"k8s_api_port" json:"k8s_api_port"`
     UBVersion         string            `yaml:"ub_version" json:"ub_version"`
@@ -129,8 +159,9 @@ type VLAN struct {
 
 // Cloud holds provider-specific configuration. Currently, only OpenStack is supported.
 type Cloud struct {
-    Provider  string        `yaml:"provider" json:"provider"`
+    Provider  string         `yaml:"provider" json:"provider"`
     OpenStack OpenStackCloud `yaml:"openstack" json:"openstack"`
+    AWS       AWSCloud       `yaml:"aws" json:"aws"`
 }
 
 // OpenStackCloud contains options for connecting to an OpenStack deployment.
@@ -149,6 +180,23 @@ type OpenStackCloud struct {
     RouterExternalNetworkID string `yaml:"router_external_network_id" json:"router_external_network_id"`
     DisableBastion     bool   `yaml:"disable_bastion" json:"disable_bastion"`
     CA                 string `yaml:"ca" json:"ca"`
+    ExternalNetwork    string `yaml:"external_network" json:"external_network"`
+    UseOctavia         bool   `yaml:"use_octavia" json:"use_octavia"`
+    VRRPIP             string `yaml:"vrrp_ip" json:"vrrp_ip"`
+}
+
+// AWSCloud contains options for connecting to AWS environments.
+type AWSCloud struct {
+    Profile        string   `yaml:"profile" json:"profile"`
+    Region         string   `yaml:"region" json:"region"`
+    VPCID          string   `yaml:"vpc_id" json:"vpc_id"`
+    PrivateSubnets []string `yaml:"private_subnets" json:"private_subnets"`
+    PublicSubnets  []string `yaml:"public_subnets" json:"public_subnets"`
+}
+
+// Secrets holds paths or settings for secret management tools.
+type Secrets struct {
+    SopsAgeKeyFile string `yaml:"sops_age_key_file" json:"sops_age_key_file"`
 }
 
 // defaultConfig returns a Config pre-populated with the default
@@ -158,9 +206,12 @@ func defaultConfig(name string) Config {
     cfg := Config{
         ClusterName:  name,
         NamingPrefix: "",
+        Cluster: ClusterMeta{},
         GitOps: GitOpsConfig{
             GitDir: "",
             GitURL: "",
+            GitBranch: "",
+            Flux: GitOpsFlux{},
         },
         Terraform: Terraform{
             Enabled: true,
@@ -169,8 +220,15 @@ func defaultConfig(name string) Config {
         Ansible: Ansible{
             Enabled: true,
             Path:    "ansible",
+            Inventory: "",
+            Playbooks: []string{},
         },
-        Kubernetes: Kubernetes{
+        IAC: IAC{
+            Engine:            "",
+            Stack:             "",
+            Version:           "",
+            CNI:               "",
+            Ingress:           "",
             SSHUser:           "ubuntu",
             K8sAPIPort:        443,
             UBVersion:         "20",
@@ -226,8 +284,13 @@ func defaultConfig(name string) Config {
                 RouterExternalNetworkID: "",
                 DisableBastion:    false,
                 CA:               "",
+                ExternalNetwork:   "",
+                UseOctavia:        false,
+                VRRPIP:            "",
             },
+            AWS: AWSCloud{},
         },
+        Secrets: Secrets{},
     }
     return cfg
 }
@@ -471,30 +534,30 @@ func Validate(cfg Config) []string {
     if cfg.GitOps.GitDir == "" {
         errs = append(errs, "gitops.git_dir must be set")
     }
-    n := cfg.Kubernetes.Networking
+    n := cfg.IAC.Networking
     // If use_octavia is true then vrrp_enabled must be false
     if n.UseOctavia && n.VRRPEnabled {
-        errs = append(errs, "kubernetes.networking.use_octavia=true and vrrp_enabled=true are mutually exclusive")
+        errs = append(errs, "iac.networking.use_octavia=true and vrrp_enabled=true are mutually exclusive")
     }
     // If use_octavia is false, vrrp_ip must be set
     if !n.UseOctavia {
         if n.VRRPIP == "" {
-            errs = append(errs, "kubernetes.networking.use_octavia=false requires vrrp_ip to be set")
+            errs = append(errs, "iac.networking.use_octavia=false requires vrrp_ip to be set")
         }
     }
     // If vrrp_enabled is true, vrrp_ip must be set
     if n.VRRPEnabled && n.VRRPIP == "" {
-        errs = append(errs, "kubernetes.networking.vrrp_enabled=true requires vrrp_ip to be set")
+        errs = append(errs, "iac.networking.vrrp_enabled=true requires vrrp_ip to be set")
     }
     // If use_designate is true, dns_zone_name must be set
     if n.UseDesignate && n.DNSZoneName == "" {
-        errs = append(errs, "kubernetes.networking.use_designate=true requires dns_zone_name to be set")
+        errs = append(errs, "iac.networking.use_designate=true requires dns_zone_name to be set")
     }
     // If counts > 0, corresponding flavors must be set
-    for role, count := range cfg.Kubernetes.Counts {
+    for role, count := range cfg.IAC.Counts {
         if count > 0 {
-            if _, ok := cfg.Kubernetes.Flavors[role]; !ok || cfg.Kubernetes.Flavors[role] == "" {
-                errs = append(errs, fmt.Sprintf("kubernetes.counts.%s > 0 requires kubernetes.flavors.%s to be set", role, role))
+            if _, ok := cfg.IAC.Flavors[role]; !ok || cfg.IAC.Flavors[role] == "" {
+                errs = append(errs, fmt.Sprintf("iac.counts.%s > 0 requires iac.flavors.%s to be set", role, role))
             }
         }
     }

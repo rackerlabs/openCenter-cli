@@ -169,6 +169,25 @@ Feature: Cluster command group
     And stdout should contain "openCenter cluster select guided"
 
   # ---------------------------------------------------------------------------
+  # update
+  # ---------------------------------------------------------------------------
+  @update @by_name
+  Scenario: Update a named cluster using dotted flags
+    Given a cluster "upd1" exists
+    When I run "openCenter cluster update upd1 --iac.counts.master=3 --iac.k8s_api_port=6444"
+    Then the exit code should be 0
+    And the cluster configuration "upd1" should have "iac.counts.master" set to "3"
+    And the cluster configuration "upd1" should have "iac.k8s_api_port" set to "6444"
+
+  @update @active
+  Scenario: Update the active cluster when name is omitted
+    Given a cluster "upd2" exists
+    And the active cluster is "upd2"
+    When I run "openCenter cluster update --gitops.git_branch=dev"
+    Then the exit code should be 0
+    And the cluster configuration "upd2" should have "gitops.git_branch" set to "dev"
+
+  # ---------------------------------------------------------------------------
   # setup
   # ---------------------------------------------------------------------------
   @setup @materialize
@@ -258,4 +277,3 @@ Feature: Cluster command group
     And stderr should contain "git_dir"
     And stderr should contain "git_url"
     And stderr should contain "must be set"
-

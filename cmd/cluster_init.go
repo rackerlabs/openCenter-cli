@@ -14,15 +14,18 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"reflect"
-	"strconv"
-	"strings"
+    "crypto/rand"
+    "encoding/hex"
+    "fmt"
+    "os"
+    "path/filepath"
+    "reflect"
+    "strconv"
+    "strings"
 
-	"github.com/rackerlabs/openCenter/internal/config"
-	"github.com/rackerlabs/openCenter/internal/util"
-	"github.com/spf13/cobra"
+    "github.com/rackerlabs/openCenter/internal/config"
+    "github.com/rackerlabs/openCenter/internal/util"
+    "github.com/spf13/cobra"
 )
 
 // setField sets a field in a struct using a dot-notation path.
@@ -138,7 +141,7 @@ func newClusterInitCmd() *cobra.Command {
 			cfg := config.NewDefault(name)
 
 			// Apply overrides from flags.
-			// We parse os.Args manually here because cobra does not support
+            // We parse os.Args manually here because cobra does not support
 			// unknown flags in a way that allows us to capture them.
 			// FParseErrWhitelist.UnknownFlags = true makes cobra ignore them,
 			// but it does not provide a way to access them.
@@ -147,7 +150,7 @@ func newClusterInitCmd() *cobra.Command {
 					parts := strings.SplitN(strings.TrimPrefix(arg, "--"), "=", 2)
 					if len(parts) == 2 {
 						key, value := parts[0], parts[1]
-						// Skip flags that are handled by cobra
+                    // Skip flags that are handled by cobra
 						if cmd.Flags().Lookup(key) != nil {
 							continue
 						}
@@ -192,6 +195,14 @@ func newClusterInitCmd() *cobra.Command {
 			}
 
 			// Persist config
+            // If no SOPS key location provided, generate one named after cluster
+            disableKeygen, _ := cmd.Flags().GetBool("no-sops-keygen")
+            if !disableKeygen && cfg.Secrets.SopsAgeKeyFile == "" && name != "" {
+                if err := generateDefaultSOPSKey(name, &cfg); err != nil {
+                    return fmt.Errorf("failed to generate default SOPS key: %w", err)
+                }
+            }
+
 			if err := config.Save(cfg); err != nil {
 				return err
 			}
@@ -199,7 +210,35 @@ func newClusterInitCmd() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().Bool("strict", false, "fail if required values are missing")
-	cmd.Flags().Bool("force", false, "overwrite existing file")
-	return cmd
+    cmd.Flags().Bool("strict", false, "fail if required values are missing")
+    cmd.Flags().Bool("force", false, "overwrite existing file")
+    cmd.Flags().Bool("no-sops-keygen", false, "do not auto-generate a SOPS age key when secrets.sops_age_key_file is unset")
+    return cmd
+}
+
+// generateDefaultSOPSKey creates an age key file under the config directory
+// at sops/age/keys/<cluster>-key.txt and updates cfg.Secrets.SopsAgeKeyFile
+// to point to the generated file. The key is a placeholder that starts with
+// AGE-SECRET-KEY-1 followed by random bytes; file perms are 0600.
+func generateDefaultSOPSKey(cluster string, cfg *config.Config) error {
+    dir, err := config.ResolveConfigDir()
+    if err != nil {
+        return err
+    }
+    rel := filepath.Join("sops", "age", "keys", fmt.Sprintf("%s-key.txt", cluster))
+    out := filepath.Join(dir, rel)
+    if err := os.MkdirAll(filepath.Dir(out), 0o755); err != nil {
+        return err
+    }
+    // generate a key
+    var b [32]byte
+    if _, err := rand.Read(b[:]); err != nil {
+        return err
+    }
+    key := fmt.Sprintf("AGE-SECRET-KEY-1%s\n", hex.EncodeToString(b[:]))
+    if err := os.WriteFile(out, []byte(key), 0o600); err != nil {
+        return err
+    }
+    cfg.Secrets.SopsAgeKeyFile = out
+    return nil
 }

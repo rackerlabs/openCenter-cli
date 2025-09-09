@@ -47,6 +47,7 @@ func Execute(version string) error {
     rootCmd.Version = version
     // Register subcommands
     rootCmd.AddCommand(newClusterCmd())
+    rootCmd.AddCommand(newSecretsCmd())
     // Global persistent flag for config-dir
     rootCmd.PersistentFlags().String("config-dir", "", "configuration directory (defaults to ~/.config/openCenter on Linux/macOS)")
     return rootCmd.Execute()

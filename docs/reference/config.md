@@ -14,11 +14,13 @@ These are the main keys at the root of the configuration file.
 | --- | --- | --- | --- |
 | `cluster_name` | `string` | Yes | The unique name for the cluster. This is used as the filename. |
 | `naming_prefix`| `string` | No | An optional prefix for all named resources. |
+| `cluster` | `object` | No | High-level metadata: `name`, `env`, `region`, `status`. |
 | `gitops` | `object` | Yes | Configuration for the GitOps repository. |
 | `terraform` | `object` | No | Settings for Terraform integration. |
 | `ansible` | `object` | No | Settings for Ansible integration. |
-| `kubernetes` | `object` | Yes | All Kubernetes-specific settings. |
+| `iac` | `object` | Yes | Infrastructure-as-code and cluster layout settings. |
 | `cloud` | `object` | Yes | All cloud provider-specific settings. |
+| `secrets` | `object` | No | Secret management settings. |
 
 ---
 
@@ -29,6 +31,9 @@ These are the main keys at the root of the configuration file.
 | `git_dir` | `string` | `""` | **Required.** The absolute path on your local machine where the GitOps repository will be generated. |
 | `git_url` | `string` | `""` | **Required.** The SSH URL of the remote Git repository where the configuration will be pushed. |
 | `git_ssh_key`| `string` | `""` | Optional. Path to a specific SSH private key to use for pushing to the remote repository. |
+| `git_branch`| `string` | `""` | Optional. Branch to push to (defaults to `main` if unset in bootstrap). |
+| `flux.interval`| `string` | `""` | Optional. Reconciliation interval (e.g., `1m`). |
+| `flux.prune`| `boolean` | `false` | Optional. Enable pruning in Flux. |
 
 ---
 
@@ -47,10 +52,12 @@ These are the main keys at the root of the configuration file.
 | --- | --- | --- | --- |
 | `enabled` | `boolean` | `true` | Whether to use Ansible for provisioning. |
 | `path` | `string` | `ansible` | The subdirectory within the `git_dir` for Ansible files. |
+| `inventory` | `string` | `""` | Optional. Path or filename for inventory. |
+| `playbooks` | `array` | `[]` | Optional. List of playbooks to include. |
 
 ---
 
-## `kubernetes`
+## `iac`
 
 This section contains all settings related to the Kubernetes cluster itself.
 
@@ -86,7 +93,7 @@ counts:
 ```
 ---
 
-### `kubernetes.storage`
+### `iac.storage`
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -96,7 +103,7 @@ counts:
 
 ---
 
-### `kubernetes.networking`
+### `iac.networking`
 
 | Field | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -134,6 +141,19 @@ counts:
 | `openstack.router_external_network_id` | `string` | Yes | The ID of the external network for the router. |
 | `openstack.disable_bastion` | `boolean`| No | If true, do not create a bastion host. Default `false`. |
 | `openstack.ca` | `string` | No | Path to a custom CA certificate for the OpenStack endpoint. |
+| `openstack.external_network` | `string` | No | Name of the external network. |
+| `openstack.use_octavia` | `boolean` | No | Convenience flag for Octavia usage. |
+| `openstack.vrrp_ip` | `string` | No | Convenience VRRP IP when not using Octavia. |
+
+## `cloud.aws`
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `aws.profile` | `string` | No | AWS profile name. |
+| `aws.region` | `string` | No | AWS region. |
+| `aws.vpc_id` | `string` | No | Target VPC ID. |
+| `aws.private_subnets` | `array` | No | Private subnet IDs. |
+| `aws.public_subnets` | `array` | No | Public subnet IDs. |
 
 ---
 
@@ -142,10 +162,10 @@ counts:
 The `openCenter cluster validate` command enforces these rules:
 
 *   `gitops.git_dir` must be set.
-*   If `kubernetes.networking.use_octavia` is `true`, then `vrrp_enabled` must be `false`.
-*   If `kubernetes.networking.use_octavia` is `false`, then `vrrp_ip` must be set.
-*   If `kubernetes.networking.vrrp_enabled` is `true`, then `vrrp_ip` must be set.
-*   If `kubernetes.networking.use_designate` is `true`, then `dns_zone_name` must be set.
+*   If `iac.networking.use_octavia` is `true`, then `vrrp_enabled` must be `false`.
+*   If `iac.networking.use_octavia` is `false`, then `vrrp_ip` must be set.
+*   If `iac.networking.vrrp_enabled` is `true`, then `vrrp_ip` must be set.
+*   If `iac.networking.use_designate` is `true`, then `dns_zone_name` must be set.
 *   If a node `count` for a role is greater than 0, a corresponding `flavor` for that role must be set.
 
 ## Minimal Example
@@ -155,7 +175,20 @@ cluster_name: demo
 gitops:
   git_dir: /tmp/opencenter-demo
   git_url: git@github.com:example/demo.git
-kubernetes:
+  git_branch: main
+  flux:
+    interval: 1m
+    prune: true
+ansible:
+  enabled: true
+  path: ansible
+  inventory: inventory.yaml
+  playbooks:
+    - hardening.yaml
+    - node-setup.yaml
+iac:
+  engine: terraform
+  stack: dev/demo
   counts:
     master: 3
     worker: 5
@@ -178,7 +211,22 @@ cloud:
     availability_zone: "nova"
     floatingip_pool: "public"
     router_external_network_id: "abc-123-def-456"
+secrets:
+  sops_age_key_file: ~/.config/sops/age/keys.txt
 ```
+
+## `secrets`
+
+Defines paths and settings related to secret management.
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `sops_age_key_file` | `string` | `""` | Path to the SOPS age secret key file used for encryption/decryption. |
+
+Notes
+- If `sops_age_key_file` is not set at init time, `openCenter` automatically generates a key at `~/.config/openCenter/sops/age/keys/<cluster-name>-key.txt` and updates the saved config accordingly.
+- The generated file is written with permissions `0600` and contains a key string starting with `AGE-SECRET-KEY-1`.
+ - To disable auto-generation during init, pass `--no-sops-keygen` to `openCenter cluster init`.
 
 ### Sources
 

@@ -66,15 +66,15 @@ func TestConfig(t *testing.T) {
 	t.Run("Validate", func(t *testing.T) {
 		cfg := NewDefault("test")
 		cfg.GitOps.GitDir = "/tmp/gitops"
-		cfg.Kubernetes.Networking.DNSZoneName = "example.com"
+        cfg.IAC.Networking.DNSZoneName = "example.com"
 		errs := Validate(cfg)
 		if len(errs) != 0 {
 			t.Errorf("unexpected validation errors: %v", errs)
 		}
 
 		// Test validation failure
-		cfg.Kubernetes.Networking.UseOctavia = true
-		cfg.Kubernetes.Networking.VRRPEnabled = true
+        cfg.IAC.Networking.UseOctavia = true
+        cfg.IAC.Networking.VRRPEnabled = true
 		errs = Validate(cfg)
 		if len(errs) == 0 {
 			t.Error("expected validation error, but got none")
