@@ -16,8 +16,11 @@ package cmd
 import (
     "fmt"
     "os"
+    "strings"
 
     "github.com/spf13/cobra"
+
+    "github.com/rackerlabs/openCenter/internal/plugins"
 )
 
 var rootCmd = &cobra.Command{
@@ -45,11 +48,29 @@ var rootCmd = &cobra.Command{
 //   - error: An error if one occurred during execution.
 func Execute(version string) error {
     rootCmd.Version = version
+    // Define global persistent flag for config-dir early so we can pre-parse it
+    rootCmd.PersistentFlags().String("config-dir", "", "configuration directory (defaults to ~/.config/openCenter on Linux/macOS)")
+
+    // Pre-parse --config-dir from os.Args so plugin discovery can use it
+    // before Cobra runs PersistentPreRunE.
+    for i := 0; i < len(os.Args); i++ {
+        a := os.Args[i]
+        if a == "--config-dir" && i+1 < len(os.Args) {
+            _ = os.Setenv("OPENCENTER_CONFIG_DIR", os.Args[i+1])
+            break
+        }
+        if strings.HasPrefix(a, "--config-dir=") {
+            _ = os.Setenv("OPENCENTER_CONFIG_DIR", strings.TrimPrefix(a, "--config-dir="))
+            break
+        }
+    }
+
     // Register subcommands
     rootCmd.AddCommand(newClusterCmd())
     rootCmd.AddCommand(newSecretsCmd())
-    // Global persistent flag for config-dir
-    rootCmd.PersistentFlags().String("config-dir", "", "configuration directory (defaults to ~/.config/openCenter on Linux/macOS)")
+    rootCmd.AddCommand(newPluginsCmd())
+    // Discover and attach external plugins as subcommands
+    plugins.LoadExternalPlugins(rootCmd)
     return rootCmd.Execute()
 }
 

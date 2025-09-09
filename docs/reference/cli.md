@@ -10,6 +10,10 @@ These flags are available on all `openCenter` commands.
 | --- | --- | --- | --- |
 | `--config-dir <path>` | Specifies the directory where cluster configuration files are stored. | `~/.config/openCenter` | `OPENCENTER_CONFIG_DIR` |
 
+### Environment Variables
+- `OPENCENTER_CONFIG_DIR`: Overrides the configuration directory. Passing `--config-dir` sets this variable for the process.
+- `OPENCENTER_PLUGINS_DIR`: Directory searched first for plugin executables before `$OPENCENTER_CONFIG_DIR/plugins` and `PATH`.
+
 ---
 
 ## `openCenter cluster`
@@ -27,6 +31,29 @@ Lists all available cluster configurations found in the configuration directory.
 **Usage**
 ```bash
 openCenter cluster list [flags]
+```
+
+---
+
+## `openCenter plugins`
+
+Manage external plugins.
+
+Plugins are executables named `openCenter-<name>` discovered at runtime and exposed as `openCenter <name>`. See `docs/reference/plugins.md` for discovery rules and examples.
+
+### `openCenter plugins list`
+
+Lists discovered plugins and their paths.
+
+Usage
+```bash
+openCenter plugins list
+```
+
+Example
+```bash
+openCenter plugins list
+# kubectl	/Users/alice/.config/openCenter/plugins/openCenter-kubectl
 ```
 
 **Flags**
