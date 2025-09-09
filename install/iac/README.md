@@ -30,6 +30,9 @@ The deployment node could be your laptop or an existing Linux VM.
     - [Complete the Hardening by deploying CSR Approver](#complete-the-hardening-by-deploying-csr-approver)
     - [Bootstrap Flux](#bootstrap-flux)
       - [Steps](#steps)
+    - [Commit to Git](#commit-to-git)
+  - [Save the SSH Keys to PasswordSafe](#save-the-ssh-keys-to-passwordsafe)
+  - [Save the Kubeconfig file in PasswordSsafe](#save-the-kubeconfig-file-in-passwordssafe)
 - [Outcome](#outcome)
   - [Virtual Machines](#virtual-machines)
   - [Kubernetes Cluster](#kubernetes-cluster)
@@ -242,7 +245,7 @@ We deploy kubespray without a CNI to allow for the option of deploying any of th
 
 ```
 # helm repo add projectcalico https://docs.tigera.io/calico/charts
-# helm upgrade --install calico projectcalico/tigera-operator --namespace tigera-operator -f ../../../applications/overlays/demo-cluster/managed-services/calico/helm-values/override_values.yaml --create-namespace
+# helm upgrade --install calico projectcalico/tigera-operator --namespace tigera-operator -f ../../../applications/overlays/demo-cluster/services/calico/helm-values/override_values.yaml --create-namespace
 ```
 
 ### Complete the Hardening by deploying CSR Approver
@@ -251,7 +254,16 @@ Part of the hardening configuration is to allow Kubelet to renew its certificate
 
 **NOTE:** If the kubelet_rotate_server_certificates is true and the cluster doesnt have a CNI installed, the kubespray ansible playbook run will fail to deploy the `kubelet-csr-approver` helm chart.
 
+Apply terraform to have it update the hardeninig yaml template file.
 ```
+# terraform apply
+
+```
+Then
+
+```
+export ANSIBLE_INVENTORY=${PWD}/inventory/inventory.yaml
+cd kubespray
 ansible-playbook -f 10 -b upgrade-cluster.yml -e "@../inventory/k8s_hardening.yml"
 
 ```
@@ -266,6 +278,24 @@ ansible-playbook -f 10 -b upgrade-cluster.yml -e "@../inventory/k8s_hardening.ym
 - Install Flux curl flux.sh | kubectl apply -f -
 - Run the flux boostrap git command to initialize the repository using the ssh key
 - 
+
+### Commit to Git
+We want to make sure we commit and exclude the correct files to the repository
+
+Files need encryption. Generated from the cluster hardening.
+
+`inventory/credentials/kube_encrypt_token.creds`
+
+`inventory/credentials/kubeadm_certificate_key.creds`
+
+
+
+## Save the SSH Keys to PasswordSafe
+The files `id_rsa` and `id_rsa.pub` need to be saved to the customer's password safe in https://passwordsafe.corp.rackspace.com/projects/32616
+
+## Save the Kubeconfig file in PasswordSsafe
+The file `kubeconfig.yaml` needs to be saved to the customer's password safe in https://passwordsafe.corp.rackspace.com/projects/32616
+
 
 
 # Outcome
