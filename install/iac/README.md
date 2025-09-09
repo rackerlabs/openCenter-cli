@@ -9,7 +9,6 @@ The terraform state file will be stored in an S3 bucket
 This will configure a Ubuntu 24.04 Linux VM as a deployment node that will be used to bootstrap and deploy openCenter clusters. The VM can go away once the resulting files have been committed to a code repository.
 The deployment node could be your laptop or an existing Linux VM. 
 
-
 - [openCenter Deployment Guide](#opencenter-deployment-guide)
   - [Pre Requisites](#pre-requisites)
     - [Packages](#packages)
@@ -37,7 +36,6 @@ The deployment node could be your laptop or an existing Linux VM.
 - [Infra Module Configuration Options](#infra-module-configuration-options)
 - [To Do's:](#to-dos)
 
-
 # openCenter Deployment Guide
 
 ## Pre Requisites
@@ -62,6 +60,7 @@ export PATH=${BIN}:${PATH}
 ```
 
 ### OpenTofu Requirements
+
 #### Create S3 Bucket
 The S3 bucket will be used to store the OpenTofu state file remotely.
 
@@ -290,9 +289,48 @@ demo-cluster-wn1   Ready    <none>          17h   v1.31.4
 
 # Infra Module Configuration Options
 
-| Key | Type | Default | Description |
+### openCenter
+| key | type | default | description |
 | --- | --- | --- | --- |
-| cluster_name | string | ""  | Sets the name of the Cluster, Openstack Project and User. |
+| cluster_name | string | ""  | sets the name of the cluster, openstack project and user. |
+| statsu | string | "config"  | sets the name of the cluster, openstack project and user. |
+
+### gitops
+| key | type | default | description |
+| --- | --- | --- | --- |
+| kube | string | ""  | sets the name of the cluster, openstack project and user. |
+| statsu | string | "config"  | sets the name of the cluster, openstack project and user. |
+
+### Kubernetes
+#### kubespray
+| key | type | default | description |
+| --- | --- | --- | --- |
+| kube | string | ""  | sets the name of the cluster, openstack project and user. |
+
+####  calico
+| key | type | default | description |
+| --- | --- | --- | --- |
+|  |  | ""  | |
+
+####  cilium
+| key | type | default | description |
+| --- | --- | --- | --- |
+|  |  | ""  | |
+
+####  kube-ovn
+| key | type | default | description |
+| --- | --- | --- | --- |
+|  |  | ""  | |
+
+####  kube-ovn + celium
+| key | type | default | description |
+| --- | --- | --- | --- |
+|  |  | ""  | |
+
+### infra module
+| key | type | default | description |
+| --- | --- | --- | --- |
+| cluster_name | string | ""  | sets the name of the cluster, openstack project and user. |
 | naming_prefix | string | ""  | Prefix to add to Resource Names |
 | openstack_auth_url | string | ""  | Openstack Keystone Endpoint |
 | openstack_insecure | bool | false | Trust self-signed SSL certificates. |

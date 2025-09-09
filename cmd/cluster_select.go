@@ -32,24 +32,38 @@ var (
 	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
 )
 
+// item represents a single selectable entry in the interactive list.
+// It implements the `list.Item` interface required by the `huh` library's list component.
 type item struct {
 	title string
 }
 
-func (i item) Title() string       { return i.title }
+// Title returns the display text for the list item.
+func (i item) Title() string { return i.title }
+
+// Description provides additional details for the list item (unused in this case).
 func (i item) Description() string { return "" }
+
+// FilterValue returns the string value used for filtering the list.
 func (i item) FilterValue() string { return i.title }
 
+// model encapsulates the state for the interactive cluster selection list.
+// It holds the list component, the user's final choice, and a flag for quitting.
 type model struct {
 	list     list.Model
 	choice   string
 	quitting bool
 }
 
+// Init initializes the Bubble Tea model.
+// It is part of the `tea.Model` interface and is called once at the start.
 func (m model) Init() tea.Cmd {
 	return nil
 }
 
+// Update handles incoming messages and updates the model's state.
+// It processes key presses for navigation, selection, and quitting, as well as
+// window resize events to ensure the list is rendered correctly.
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -75,16 +89,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// View renders the UI for the current state of the model.
+// It displays the interactive list unless the user has made a choice or is quitting.
 func (m model) View() string {
-	if m.choice != "" {
-		return ""
-	}
-	if m.quitting {
+	if m.choice != "" || m.quitting {
 		return ""
 	}
 	return docStyle.Render(m.list.View())
 }
 
+// newClusterSelectCmd creates the command for selecting the active cluster.
+//
+// This command allows the user to set the active cluster, which subsequent commands
+// will use by default. If a cluster name is provided as an argument, it is set
+// as active directly. If no argument is given, it launches an interactive
+// terminal UI where the user can select from a list of available clusters.
+//
+// Returns:
+//   - *cobra.Command: A pointer to the configured `select` command.
 func newClusterSelectCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "select [name]",

@@ -24,6 +24,15 @@ import (
 	"encoding/json"
 )
 
+// newClusterListCmd creates the command for listing all configured clusters.
+//
+// This command retrieves the names of all clusters from the configuration
+// directory and prints them to standard output, one per line. It also supports
+// a `--json` flag, which formats the output as a JSON array for easier
+// consumption by scripts and other tools.
+//
+// Returns:
+//   - *cobra.Command: A pointer to the configured `list` command.
 func newClusterListCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "list",

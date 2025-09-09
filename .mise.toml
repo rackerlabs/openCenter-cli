@@ -36,3 +36,30 @@ preflight = "./bin/openCenter cluster preflight"
 # Generate and view documentation
 doc = "go doc ./..."
 doc-serve = "go run golang.org/x/pkgsite/cmd/pkgsite@latest"
+
+lint = [
+  "echo Linting...",
+  "bin/golangci-lint run ./..."
+]
+
+gitea-setup = [
+  "echo Starting gitea...",
+  "./hack/gitea-local/setup-gitea.sh"
+]
+
+gitea-configure = [
+  "echo Starting gitea...",
+  "./hack/gitea-local/configure-gitea-user-tokens.sh"
+]
+
+gitea-cleanup = [
+  "echo Cleaning up local git...",
+  "./hack/gitea-local/setup-gitea.sh destroy -y",
+  "rm -f .gitea_admin_token .gitea_newuser_token"
+]
+
+clean = [
+  "echo Cleaning up...",
+  "rm -rf testdata",
+  "rm -rf bin"
+]

@@ -20,38 +20,48 @@ import (
     "github.com/spf13/cobra"
 )
 
+// newClusterValidateCmd creates the command for validating a cluster's configuration.
+//
+// This command loads a cluster's configuration and runs a series of validation
+// checks defined in the `config.Validate` function. If any validation rules
+// are violated, it prints the errors to standard error and exits with a non-zero
+// status code. If the configuration is valid, it prints a success message to
+// standard output.
+//
+// Returns:
+//   - *cobra.Command: A pointer to the configured `validate` command.
 func newClusterValidateCmd() *cobra.Command {
-    return &cobra.Command{
-        Use:   "validate [name]",
-        Short: "Validate cluster configuration invariants",
-        Args:  cobra.MaximumNArgs(1),
-        RunE: func(cmd *cobra.Command, args []string) error {
-            var name string
-            if len(args) > 0 {
-                name = args[0]
-            } else {
-                var err error
-                name, err = config.GetActive()
-                if err != nil {
-                    return err
-                }
-                if name == "" {
-                    return fmt.Errorf("no active cluster; specify name")
-                }
-            }
-            cfg, err := config.Load(name)
-            if err != nil {
-                return err
-            }
-            errs := config.Validate(cfg)
-            if len(errs) > 0 {
-                for _, e := range errs {
-                    fmt.Fprintln(cmd.ErrOrStderr(), e)
-                }
-                return fmt.Errorf("validation failed")
-            }
-            fmt.Fprintln(cmd.OutOrStdout(), "Validation successful.")
-            return nil
-        },
-    }
+	return &cobra.Command{
+		Use:   "validate [name]",
+		Short: "Validate cluster configuration invariants",
+		Args:  cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var name string
+			if len(args) > 0 {
+				name = args[0]
+			} else {
+				var err error
+				name, err = config.GetActive()
+				if err != nil {
+					return err
+				}
+				if name == "" {
+					return fmt.Errorf("no active cluster; specify name")
+				}
+			}
+			cfg, err := config.Load(name)
+			if err != nil {
+				return err
+			}
+			errs := config.Validate(cfg)
+			if len(errs) > 0 {
+				for _, e := range errs {
+					fmt.Fprintln(cmd.ErrOrStderr(), e)
+				}
+				return fmt.Errorf("validation failed")
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Validation successful.")
+			return nil
+		},
+	}
 }

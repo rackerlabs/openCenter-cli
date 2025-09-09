@@ -2,7 +2,6 @@
 
 > Version: v0.0.1 • Language: Go 1.24 • Core libs: Cobra, Viper, text/template+Sprig, Godog • Tooling: mise
 
-
 For detailed instructions on how to do local development refer to the [local development setup](docs/local-development.md).
 
 ### Prerequisites
@@ -47,20 +46,17 @@ There are more task available in the .mise.toml
 
 ## 1) Purpose & Scope
 
-**openCenter CLI** streamlines cluster bootstrapping by managing a *single, declarative cluster config* and turning it into a **GitOps working repository** that can be pushed to a remote. It aims to standardize how teams scaffold and validate Kubernetes/OpenStack-based environments while remaining provider-agnostic at the command layer.
+**openCenter CLI** streamlines cluster bootstrapping by managing a *single, declarative cluster config* and turning it into a **GitOps working repository** that can be pushed to a remote. It aims to standardize how teams scaffold and validate Kubernetes/OpenStack-based environments while remaining provider-agnostic at the command layer. Once the cluster is boostrap and running. The created config is only useful to recreate the cluster. The source of truth for a running cluster is git and the s3/swift bucket.
 
 ### Primary goals
 - **Configuration-first**: a grouped YAML becomes the single source of truth.
 - **GitOps by default**: render embedded templates into a local repo (`gitops.git_dir`) and push to a remote (`gitops.git_url`).
 - **Safe defaults** with **explicit validation** for common misconfigurations (e.g., VRRP vs Octavia).
 - **UX & automation friendly**: interactive prompts on init/select, JSON Schema for IDE validation, and **Godog BDD** specs for regression tests and LLM-agent workflows.
-
-### Non‑goals
-- Directly provisioning cloud infrastructure (Terraform/Pulumi). The CLI produces a GitOps repo you can plug into your platform pipeline.
-- Managing secrets in secure stores; secrets here are plain YAML unless you integrate something like SOPS/SealedSecrets outside the tool.
+- **Inrastrucutre Provisioning**: cloud infrastructure (Terraform/Pulumi).
+- **Managing secrets**: in secure store by supporting SOPS/SealedSecrets.
 
 ---
-
 ## 2) Personas & Usage Modes
 
 - **Platform engineers** – author/edit cluster configs, validate invariants, render GitOps repos, push to a central Git service.
@@ -365,11 +361,10 @@ cloud:
 - `use_octavia=true` **and** `vrrp_enabled=true` → **error**
 - `use_octavia=false` **and** `vrrp_ip` empty → **error**
 - `use_designate=true` **and** `dns_zone_name` empty → **error**
-- Node counts > 0 require corresponding flavors
+- `Node counts > 0` require corresponding flavors
 - `gitops.git_dir` must be set
 
 ---
-
-*Document updated on 2025-09-07.*
+*Document updated on 2025-09-08.*
 
 ---

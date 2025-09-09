@@ -21,34 +21,43 @@ import (
     "github.com/spf13/cobra"
 )
 
+// newClusterRenderCmd creates the command for rendering GitOps templates.
+//
+// This command specifically handles the template rendering part of the setup process.
+// It populates the GitOps directory by processing all `.tmpl` files, but unlike
+// the `setup` command, it does not perform any Git operations. This is useful
+// for inspecting the output of the templates without committing them to a repository.
+//
+// Returns:
+//   - *cobra.Command: A pointer to the configured `render` command.
 func newClusterRenderCmd() *cobra.Command {
-    return &cobra.Command{
-        Use:   "render [name]",
-        Short: "Render templates into the GitOps directory",
-        Args:  cobra.MaximumNArgs(1),
-        RunE: func(cmd *cobra.Command, args []string) error {
-            var name string
-            if len(args) > 0 {
-                name = args[0]
-            } else {
-                var err error
-                name, err = config.GetActive()
-                if err != nil {
-                    return err
-                }
-                if name == "" {
-                    return fmt.Errorf("no active cluster; specify name")
-                }
-            }
-            cfg, err := config.Load(name)
-            if err != nil {
-                return err
-            }
-            if err := gitops.CopyTemplates(cfg, true); err != nil {
-                return fmt.Errorf("failed to render templates: %w", err)
-            }
-            fmt.Fprintln(cmd.OutOrStdout(), "Render complete.")
-            return nil
-        },
-    }
+	return &cobra.Command{
+		Use:   "render [name]",
+		Short: "Render templates into the GitOps directory without initializing git",
+		Args:  cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var name string
+			if len(args) > 0 {
+				name = args[0]
+			} else {
+				var err error
+				name, err = config.GetActive()
+				if err != nil {
+					return err
+				}
+				if name == "" {
+					return fmt.Errorf("no active cluster; specify name")
+				}
+			}
+			cfg, err := config.Load(name)
+			if err != nil {
+				return err
+			}
+			if err := gitops.CopyBase(cfg, true); err != nil {
+				return fmt.Errorf("failed to render templates: %w", err)
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "Render complete.")
+			return nil
+		},
+	}
 }

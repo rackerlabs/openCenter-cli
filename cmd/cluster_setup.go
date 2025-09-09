@@ -58,7 +58,7 @@ func newClusterSetupCmd() *cobra.Command {
             }
             // Flag: --render
             render, _ := cmd.Flags().GetBool("render")
-            if err := gitops.CopyTemplates(cfg, render); err != nil {
+            if err := gitops.CopyBase(cfg, render); err != nil {
                 return fmt.Errorf("failed to prepare gitops directory: %w", err)
             }
             // Provision terraform

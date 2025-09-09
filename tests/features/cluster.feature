@@ -117,7 +117,7 @@ Feature: openCenter cluster basics
         networking:
           use_designate: false
       """
-    When I run "openCenter cluster setup demo --render --config-dir <<tmp>>/conf"
+    When I run "openCenter cluster setup demo --config-dir <<tmp>>/conf"
     Then a directory "<<tmp>>/opencenter-demo" should exist
     And a file "<<tmp>>/opencenter-demo/KUSTOMIZATION" should exist
 

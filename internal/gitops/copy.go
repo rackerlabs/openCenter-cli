@@ -25,7 +25,7 @@ import (
 	"github.com/rackerlabs/openCenter/internal/config"
 )
 
-// CopyTemplates copies or renders embedded templates into the target directory
+// CopyBase copies or renders embedded files from gitops-base-dir into the target directory
 // specified by cfg.GitOps.GitDir.
 //
 // When render is true, files ending with .tmpl are processed as Go text/templates
@@ -33,7 +33,7 @@ import (
 // template under the dot context. The .tmpl extension is stripped from the
 // destination filename.
 //
-// Non-template files are copied as-is. The directory structure under templates/
+// Non-template files are copied as-is. The directory structure under gitops-base-dir/
 // is preserved. The target directory is created if it does not exist.
 //
 // Inputs:
@@ -42,7 +42,7 @@ import (
 //
 // Outputs:
 //   - error: An error if one occurred during the copy or render operation.
-func CopyTemplates(cfg config.Config, render bool) error {
+func CopyBase(cfg config.Config, render bool) error {
     target := cfg.GitOps.GitDir
     if target == "" {
         return fmt.Errorf("gitops.git_dir is empty")
@@ -52,14 +52,14 @@ func CopyTemplates(cfg config.Config, render bool) error {
         return err
     }
     // Walk embedded files
-    err := fs.WalkDir(Files, "templates", func(path string, d fs.DirEntry, walkErr error) error {
+    err := fs.WalkDir(Files, "gitops-base-dir", func(path string, d fs.DirEntry, walkErr error) error {
         if walkErr != nil {
             return walkErr
         }
         if d.IsDir() {
             return nil
         }
-        rel, err := filepath.Rel("templates", path)
+        rel, err := filepath.Rel("gitops-base-dir", path)
         if err != nil {
             return err
         }

@@ -29,17 +29,17 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestCopyTemplates(t *testing.T) {
+func TestCopyBase(t *testing.T) {
 	dst := t.TempDir()
 	cfg := config.NewDefault("test")
 	cfg.GitOps.GitDir = dst
 
-	if err := CopyTemplates(cfg, false); err != nil {
+	if err := CopyBase(cfg, false); err != nil {
 		t.Fatal(err)
 	}
 
-	if _, err := os.Stat(filepath.Join(dst, "KUSTOMIZATION")); os.IsNotExist(err) {
-		t.Error("KUSTOMIZATION was not copied")
+	if _, err := os.Stat(filepath.Join(dst, "README.md")); os.IsNotExist(err) {
+		t.Error("README.md was not copied")
 	}
 
 	files, err := filepath.Glob(filepath.Join(dst, "*"))

@@ -18,11 +18,11 @@ import (
 	"embed"
 )
 
-// Files holds the embedded contents of the templates directory.
+// Files holds the embedded contents of the gitops-base-dir directory.
 //
-// The go:embed directive includes all files under the templates directory.
+// The go:embed directive includes all files under the gitops-base-dir directory.
 // The embedded filesystem can be accessed using Files.ReadFile or Files.Open.
 // See copy.go for usage examples.
 //
-//go:embed all:templates
+//go:embed all:gitops-base-dir
 var Files embed.FS
