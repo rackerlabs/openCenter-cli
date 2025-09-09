@@ -31,7 +31,7 @@ spec:
     kind: GitRepository
     name: opencenter-gateway-api #<= its the base flux gitrepository resource
     namespace: flux-system
-  path: base/managed-services/gateway-api
+  path: base/services/gateway-api
   targetNamespace: envoy-gateway-system
   wait: true
 ```
@@ -58,7 +58,7 @@ User can provide **cluster-specific overrides** without modifying this base.
 1. Create a folder in the cluster repo:
 
    ```
-   applications/overlays/<cluster>/managed-services/gateway-api/helm-values/
+   applications/overlays/<cluster>/services/gateway-api/helm-values/
    └── override_values.yaml
    ```
 
@@ -99,7 +99,7 @@ These will be applied together with the base and override.
 Example in cluster repo:
 
 ```
-applications/overlays/<cluster>/managed-services/gateway-api/
+applications/overlays/<cluster>/services/gateway-api/
 ├── helm-values/
 │   └── override_values.yaml
 ├── networkpolicy.yaml
