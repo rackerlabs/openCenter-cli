@@ -19,9 +19,9 @@ spec:
   targetNamespace: rackspace
   chart:
     spec:
-      chart: alert-proxy
+      chart: ./helm
       sourceRef:
-        kind: HelmChart
+        kind: GitRepository
         name: alert-proxy
         namespace: rackspace
   valuesFrom:

@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - "./namespace.yaml"
   - "./source.yaml"
-  - "./chart.yaml"
   - "./helmrelease.yaml"
 secretGenerator:
   - name: alert-proxy-values-base
