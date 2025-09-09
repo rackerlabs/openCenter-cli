@@ -1,11 +1,11 @@
+---
 ##
 ## Configuration settings related to Velero installation namespace
 ##
 
 # Labels settings in namespace
 namespace:
-  labels:
-    {}
+  labels: {}
     # Enforce Pod Security Standards with Namespace Labels
     # https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/
     # pod-security.kubernetes.io/enforce: privileged
@@ -14,7 +14,6 @@ namespace:
     # pod-security.kubernetes.io/audit-version: latest
     # pod-security.kubernetes.io/warn: privileged
     # pod-security.kubernetes.io/warn-version: latest
-
 ##
 ## End of namespace-related settings.
 ##
@@ -35,9 +34,8 @@ image:
   # One or more secrets to be used when pulling images
   imagePullSecrets: []
   # - registrySecretName
-
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 # Annotations to add to the Velero deployment's. Optional.
 #
@@ -55,8 +53,7 @@ labels: {}
 #
 # If using kube2iam or kiam, use the following annotation with your AWS_ACCOUNT_ID
 # and VELERO_ROLE_NAME filled in:
-podAnnotations:
-  {}
+podAnnotations: {}
   #  iam.amazonaws.com/role: "arn:aws:iam::<AWS_ACCOUNT_ID>:role/<VELERO_ROLE_NAME>"
 
 # Additional pod labels for Velero deployment's template. Optional
@@ -68,8 +65,7 @@ podLabels: {}
 
 # Resource requests/limits to specify for the Velero deployment.
 # https://velero.io/docs/v1.6/customize-installation/#customize-resource-requests-and-limits
-resources:
-  {}
+resources: {}
   # requests:
   #   cpu: 500m
   #   memory: 128Mi
@@ -79,8 +75,7 @@ resources:
 
 # Container resize policy for the Velero deployment.
 # See: https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/
-resizePolicy:
-  []
+resizePolicy: []
   # - resourceName: cpu
   #   restartPolicy: NotRequired
   # - resourceName: memory
@@ -88,8 +83,7 @@ resizePolicy:
 
 # Configure hostAliases for Velero deployment. Optional
 # For more information, check: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
-hostAliases:
-  []
+hostAliases: []
   # - ip: "127.0.0.1"
   #   hostnames:
   #     - "foo.local"
@@ -109,8 +103,7 @@ upgradeCRDsJob:
   # Extra volumeMounts for the Upgrade CRDs Job. Optional.
   extraVolumeMounts: []
   # Additional values to be used as environment variables. Optional.
-  extraEnvVars:
-    []
+  extraEnvVars: []
     # Simple value
     # - name: SIMPLE_VAR
     #   value: "simple-value"
@@ -126,7 +119,6 @@ upgradeCRDsJob:
   # Configure the shell cmd in case you are using custom image
   # shellCmd: /tmp/sh
   # updateCmd: /velero install --crds-only --dry-run -o yaml | /tmp/kubectl apply -f -
-
 # Configure the dnsPolicy of the Velero deployment
 # See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
 dnsPolicy: ClusterFirst
@@ -140,18 +132,15 @@ initContainers:
     volumeMounts:
       - mountPath: /target
         name: plugins
-
 # SecurityContext to use for the Velero deployment. Optional.
 # Set fsGroup for `AWS IAM Roles for Service Accounts`
 # see more informations at: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 1337
 
 # Container Level Security Context for the 'velero' container of the Velero deployment. Optional.
 # See: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
-containerSecurityContext:
-  {}
+containerSecurityContext: {}
   # allowPrivilegeEscalation: false
   # capabilities:
   #   drop: ["ALL"]
@@ -162,10 +151,10 @@ containerSecurityContext:
 lifecycle: {}
 
 # Pod priority class name to use for the Velero deployment. Optional.
-priorityClassName: ""
+priorityClassName: ''
 
 # Pod runtime class name to use for the Velero deployment. Optional.
-runtimeClassName: ""
+runtimeClassName: ''
 
 # The number of seconds to allow for graceful termination of the pod. Optional.
 terminationGracePeriodSeconds: 3600
@@ -193,7 +182,6 @@ readinessProbe:
   timeoutSeconds: 5
   successThreshold: 1
   failureThreshold: 5
-
 # Tolerations to use for the Velero deployment. Optional.
 tolerations: []
 
@@ -213,8 +201,7 @@ extraVolumes: []
 extraVolumeMounts: []
 
 # Extra K8s manifests to deploy
-extraObjects:
-  []
+extraObjects: []
   # - apiVersion: secrets-store.csi.x-k8s.io/v1
   #   kind: SecretProviderClass
   #   metadata:
@@ -250,23 +237,23 @@ metrics:
     annotations: {}
     type: ClusterIP
     labels: {}
-    nodePort: null
+    nodePort:
 
     # External/Internal traffic policy setting (Cluster, Local)
     # https://kubernetes.io/docs/reference/networking/virtual-ips/#traffic-policies
-    externalTrafficPolicy: ""
-    internalTrafficPolicy: ""
+    externalTrafficPolicy: ''
+    internalTrafficPolicy: ''
 
     # the IP family policy for the metrics Service to be able to configure dual-stack; see [Configure dual-stack](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services).
-    ipFamilyPolicy: ""
+    ipFamilyPolicy: ''
     # a list of IP families for the metrics Service that should be supported, in the order in which they should be applied to ClusterIP. Can be "IPv4" and/or "IPv6".
     ipFamilies: []
 
   # Pod annotations for Prometheus
   podAnnotations:
-    prometheus.io/scrape: "true"
-    prometheus.io/port: "8085"
-    prometheus.io/path: "/metrics"
+    prometheus.io/scrape: 'true'
+    prometheus.io/port: '8085'
+    prometheus.io/path: /metrics
 
   serviceMonitor:
     autodetect: true
@@ -365,7 +352,6 @@ kubectl:
   extraVolumes: []
   # Extra volumeMounts for the upgrade/cleanup job.. Optional.
   extraVolumeMounts: []
-
 # This job upgrades the CRDs.
 upgradeCRDs: true
 
@@ -389,9 +375,9 @@ configuration:
     # a backup storage location will be created with the name "default". Optional.
     - name:
       # provider is the name for the backup storage location provider.
-      provider: ""
+      provider: ''
       # bucket is the name of the bucket to store backups in. Required.
-      bucket: ""
+      bucket: ''
       # caCert defines a base64 encoded CA bundle to use when verifying TLS connections to the provider. Optional.
       caCert:
       # prefix is the directory under which all Velero data should be stored within the bucket. Optional.
@@ -437,7 +423,7 @@ configuration:
     # a volume snapshot location will be created with the name "default". Optional.
     - name:
       # provider is the name for the volume snapshot provider.
-      provider: ""
+      provider: ''
       credential:
         # name of the secret used by this volumeSnapshotLocation.
         name:
@@ -532,7 +518,7 @@ configuration:
     # See: https://velero.io/docs/main/repository-maintenance/
     repositoryConfigData:
       # Name of the ConfigMap to create. If not provided, will use "velero-repo-maintenance"
-      name: "velero-repo-maintenance"
+      name: velero-repo-maintenance
       # Global configuration applied to all repositories
       # This configuration is used when no specific repository configuration is found
       # global:
@@ -575,8 +561,7 @@ configuration:
   extraArgs: []
 
   # Additional values to be used as environment variables. Optional.
-  extraEnvVars:
-    []
+  extraEnvVars: []
     # Simple value
     # - name: SIMPLE_VAR
     #   value: "simple-value"
@@ -592,7 +577,6 @@ configuration:
 
   # How often repository maintain is run for repositories by default.
   defaultRepoMaintainFrequency:
-
 ##
 ## End of backup/snapshot location settings.
 ##
@@ -652,8 +636,7 @@ credentials:
   # Name of a pre-existing secret (if any) in the Velero namespace
   # that will be used to load environment variables into velero and node-agent.
   # Secret should be in format - https://kubernetes.io/docs/concepts/configuration/secret/#use-case-as-container-environment-variables
-  extraSecretRef: ""
-
+  extraSecretRef: ''
 # Whether to create backupstoragelocation crd, if false => do not create a default backup location
 backupsEnabled: false
 # Whether to create volumesnapshotlocation crd, if false => disable snapshot feature
@@ -666,13 +649,12 @@ nodeAgent:
   podVolumePath: /var/lib/kubelet/pods
   pluginVolumePath: /var/lib/kubelet/plugins
   # Pod priority class name to use for the node-agent daemonset. Optional.
-  priorityClassName: ""
+  priorityClassName: ''
   # Pod runtime class name to use for the node-agent daemonset. Optional.
-  runtimeClassName: ""
+  runtimeClassName: ''
   # Resource requests/limits to specify for the node-agent daemonset deployment. Optional.
   # https://velero.io/docs/v1.6/customize-installation/#customize-resource-requests-and-limits
-  resources:
-    {}
+  resources: {}
     # requests:
     #   cpu: 500m
     #   memory: 512Mi
@@ -681,8 +663,7 @@ nodeAgent:
     #   memory: 1024Mi
   # Container resize policy for the node-agent daemonset.
   # See: https://kubernetes.io/docs/tasks/configure-pod-container/resize-container-resources/
-  resizePolicy:
-    []
+  resizePolicy: []
     # - resourceName: cpu
     #   restartPolicy: NotRequired
     # - resourceName: memory
@@ -713,8 +694,7 @@ nodeAgent:
   extraVolumeMounts: []
 
   # Additional values to be used as environment variables for node-agent daemonset. Optional.
-  extraEnvVars:
-    []
+  extraEnvVars: []
     # Simple key/value
     # - name: SIMPLE_VAR
     #   value: "simple-value"
@@ -735,8 +715,7 @@ nodeAgent:
 
   # Configure hostAliases for node-agent daemonset. Optional
   # For more information, check: https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/
-  hostAliases:
-    []
+  hostAliases: []
     # - ip: "127.0.0.1"
     #   hostnames:
     #   - "foo.local"
@@ -767,7 +746,6 @@ nodeAgent:
 
   # Update strategy to use for the node-agent daemonset. Optional.
   updateStrategy: {}
-
 # Backup schedules to create.
 # Eg:
 # schedules:

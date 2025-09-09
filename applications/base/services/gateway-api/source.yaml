@@ -1,3 +1,4 @@
+---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
@@ -5,4 +6,4 @@ metadata:
 spec:
   url: oci://docker.io/envoyproxy
   interval: 1h
-  type: "oci"
+  type: oci

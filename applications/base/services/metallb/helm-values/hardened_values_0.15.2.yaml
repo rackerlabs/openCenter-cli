@@ -1,11 +1,12 @@
+---
 # Default values for metallb.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-loadBalancerClass: ""
+nameOverride: ''
+fullnameOverride: ''
+loadBalancerClass: ''
 
 # To configure MetalLB, you must specify ONE of the following two
 # options.
@@ -35,23 +36,23 @@ prometheus:
   # the name of the secret to be mounted in the speaker pod
   # to expose the metrics securely. If not present, a self signed
   # certificate to be used.
-  speakerMetricsTLSSecret: ""
+  speakerMetricsTLSSecret: ''
 
   # the name of the secret to be mounted in the controller pod
   # to expose the metrics securely. If not present, a self signed
   # certificate to be used.
-  controllerMetricsTLSSecret: ""
+  controllerMetricsTLSSecret: ''
 
   # prometheus doesn't have the permission to scrape all namespaces so we give it permission to scrape metallb's one
   rbacPrometheus: true
 
   # the service account used by prometheus
   # required when " .Values.prometheus.rbacPrometheus == true " and " .Values.prometheus.podMonitor.enabled=true or prometheus.serviceMonitor.enabled=true "
-  serviceAccount: ""
+  serviceAccount: ''
 
   # the namespace where prometheus is deployed
   # required when " .Values.prometheus.rbacPrometheus == true " and " .Values.prometheus.podMonitor.enabled=true or prometheus.serviceMonitor.enabled=true "
-  namespace: ""
+  namespace: ''
 
   # the image to be used for the kuberbacproxy container
   rbacProxy:
@@ -71,7 +72,7 @@ prometheus:
     annotations: {}
 
     # Job label for scrape target
-    jobLabel: "app.kubernetes.io/name"
+    jobLabel: app.kubernetes.io/name
 
     # Scrape interval. If not set, the Prometheus default scrape interval is used.
     interval:
@@ -118,7 +119,7 @@ prometheus:
         insecureSkipVerify: true
 
     # Job label for scrape target
-    jobLabel: "app.kubernetes.io/name"
+    jobLabel: app.kubernetes.io/name
 
     # Scrape interval. If not set, the Prometheus default scrape interval is used.
     interval:
@@ -167,7 +168,7 @@ prometheus:
       labels:
         severity: critical
       # Exclude the pools matching the regular expression from triggering the alert.
-      excludePools: ""
+      excludePools: ''
 
     addressPoolUsage:
       enabled: true
@@ -182,7 +183,7 @@ prometheus:
           labels:
             severity: critical
       # Exclude the pools matching the regular expression from triggering the alert.
-      excludePools: ""
+      excludePools: ''
 
     # MetalLBBGPSessionDown
     bgpSessionDown:
@@ -220,22 +221,21 @@ controller:
     create: true
     # The name of the ServiceAccount to use. If not set and create is
     # true, a name is generated using the fullname template
-    name: ""
+    name: ''
     annotations: {}
   securityContext:
     runAsNonRoot: true
     # nobody
     runAsUser: 65534
     fsGroup: 65534
-  resources:
-    {}
+  resources: {}
     # limits:
     # cpu: 100m
     # memory: 100Mi
   nodeSelector: {}
   tolerations: []
-  priorityClassName: ""
-  runtimeClassName: ""
+  priorityClassName: ''
+  runtimeClassName: ''
   affinity: {}
   podAnnotations: {}
   labels: {}
@@ -253,8 +253,8 @@ controller:
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 1
-  tlsMinVersion: "VersionTLS12"
-  tlsCipherSuites: ""
+  tlsMinVersion: VersionTLS12
+  tlsCipherSuites: ''
 
   extraContainers: []
 
@@ -270,8 +270,8 @@ speaker:
     # --  When enabled: false, the speaker pods must run on all nodes
     enabled: true
     mlBindPort: 7946
-    mlBindAddrOverride: ""
-    mlSecretKeyPath: "/etc/ml_secret_key"
+    mlBindAddrOverride: ''
+    mlSecretKeyPath: /etc/ml_secret_key
   excludeInterfaces:
     enabled: true
   # ignore the exclude-from-external-loadbalancer label
@@ -294,24 +294,23 @@ speaker:
     create: true
     # The name of the ServiceAccount to use. If not set and create is
     # true, a name is generated using the fullname template
-    name: ""
+    name: ''
     annotations: {}
   securityContext: {}
   ## Defines a secret name for the controller to generate a memberlist encryption secret
   ## By default secretName: {{ "metallb.fullname" }}-memberlist
   ##
   # secretName:
-  resources:
-    {}
+  resources: {}
     # limits:
     # cpu: 100m
     # memory: 100Mi
   nodeSelector: {}
   tolerations: []
-  priorityClassName: ""
+  priorityClassName: ''
   affinity: {}
   ## Selects which runtime class will be used by the pod.
-  runtimeClassName: ""
+  runtimeClassName: ''
   podAnnotations: {}
   labels: {}
   livenessProbe:
@@ -368,4 +367,4 @@ frrk8s:
   # mode.
   enabled: false
   external: false
-  namespace: ""
+  namespace: ''
