@@ -134,12 +134,12 @@ dnsPolicy: ClusterFirst
 # Init containers to add to the Velero deployment's pod spec. At least one plugin provider image is required.
 # If the value is a string then it is evaluated as a template.
 initContainers:
-  # - name: velero-plugin-for-aws
-  #   image: velero/velero-plugin-for-aws:v1.12.2
-  #   imagePullPolicy: IfNotPresent
-  #   volumeMounts:
-  #     - mountPath: /target
-  #       name: plugins
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.12.2
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
 
 # SecurityContext to use for the Velero deployment. Optional.
 # Set fsGroup for `AWS IAM Roles for Service Accounts`
@@ -513,7 +513,7 @@ configuration:
   defaultSnapshotMoveData:
   # Comma separated list of velero feature flags. default: empty
   # features: EnableCSI
-  features:
+  features: EnableCSI
   # Configures the timeout for provisioning the volume created from the CSI snapshot. Default: 30m
   dataMoverPrepareTimeout:
   # Resource requests/limits to specify for the repository-maintenance job. Optional.
@@ -655,9 +655,9 @@ credentials:
   extraSecretRef: ""
 
 # Whether to create backupstoragelocation crd, if false => do not create a default backup location
-backupsEnabled: true
+backupsEnabled: false
 # Whether to create volumesnapshotlocation crd, if false => disable snapshot feature
-snapshotsEnabled: true
+snapshotsEnabled: false
 
 # Whether to deploy the node-agent daemonset.
 deployNodeAgent: false
