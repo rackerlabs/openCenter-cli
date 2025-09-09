@@ -5,9 +5,18 @@ metadata:
   namespace: sealed-secrets
 spec:
   releaseName: sealed-secrets
-  interval: 30s
+  interval: 5m
+  timeout: 10m
   driftDetection:
     mode: enabled
+  install:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
   targetNamespace: sealed-secrets
   chart:
     spec:

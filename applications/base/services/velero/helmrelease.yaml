@@ -5,9 +5,18 @@ metadata:
   namespace: velero
 spec:
   releaseName: velero
-  interval: 30s
+  interval: 5m
+  timeout: 5m
   driftDetection:
     mode: enabled
+  install:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
   targetNamespace: velero
   chart:
     spec:
@@ -15,7 +24,7 @@ spec:
       version: 10.1.1
       sourceRef:
         kind: HelmRepository
-        name: vmware-tanzu
+        name: velero
         namespace: velero
   valuesFrom:
     - kind: Secret
