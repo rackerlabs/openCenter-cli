@@ -5,7 +5,6 @@ resources:
   - "./source.yaml"
   - "./chart.yaml"
   - "./helmrelease.yaml"
-
 secretGenerator:
   - name: alert-proxy-values-base
     namespace: envoy-gateway-system

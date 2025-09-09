@@ -8,27 +8,22 @@ spec:
   timeout: 10m
   driftDetection:
     mode: enabled
-
   install:
     remediation:
       retries: 3
       remediateLastFailure: true
-
   upgrade:
     remediation:
       retries: 3
       remediateLastFailure: true
-
   targetNamespace: rackspace
-
   chart:
     spec:
       chart: alert-proxy
       sourceRef:
         kind: HelmChart
         name: alert-proxy
-        namespace: flux-system
-
+        namespace: rackspace
   valuesFrom:
     - kind: Secret
       name: alert-proxy-values-base
