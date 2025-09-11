@@ -1,5 +1,5 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: kube-prometheus-stack
@@ -10,6 +10,7 @@ spec:
   driftDetection:
     mode: enabled
   install:
+    createNamespace: true
     remediation:
       retries: 3
       remediateLastFailure: true
@@ -18,7 +19,6 @@ spec:
       retries: 3
       remediateLastFailure: true
   targetNamespace: observability
-  createNamespace: true
   chart:
     spec:
       chart: kube-prometheus-stack
