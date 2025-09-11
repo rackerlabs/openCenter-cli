@@ -20,9 +20,10 @@ spec:
   targetNamespace: observability
   chart:
     spec:
-      chart: ./helm
+      chart: kube-prometheus-stack
+      version: 77.6.0
       sourceRef:
-        kind: GitRepository
+        kind: HelmRepository
         name: kube-prometheus-stack
         namespace: observability
   valuesFrom:
