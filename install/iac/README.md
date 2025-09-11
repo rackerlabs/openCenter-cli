@@ -294,13 +294,15 @@ ansible-playbook -f 10 -b upgrade-cluster.yml -e "@../inventory/k8s_hardening.ym
 ### Commit to Git
 We want to make sure we commit and exclude the correct files to the repository
 
-Files need encryption. Generated from the cluster hardening.
+Files need encryption. Generated from the cluster hardening and CA certs.
 
 `inventory/credentials/kube_encrypt_token.creds`
 
 `inventory/credentials/kubeadm_certificate_key.creds`
 
+There is a fix in place so that if we run cluster operations without the files present in the directory structure, the playbook will grab a copy from the masters to avoid creating a new one and drift. But we still need a process where we pull the files from a store and place them in the directory structure before making changes in the cluster
 
+https://github.com/kubernetes-sigs/kubespray/pull/4255
 
 ## Save the SSH Keys to PasswordSafe
 The files `id_rsa` and `id_rsa.pub` need to be saved to the customer's password safe in https://passwordsafe.corp.rackspace.com/projects/32616
