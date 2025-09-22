@@ -38,7 +38,6 @@ func GenerateSchema(pretty bool) ([]byte, error) {
         "title":   "openCenter Cluster Configuration",
         "type":    "object",
         "properties": map[string]any{
-            "cluster_name": map[string]any{"type": "string"},
             "cluster": map[string]any{
                 "type":       "object",
                 "properties": map[string]any{
@@ -351,7 +350,7 @@ func GenerateSchema(pretty bool) ([]byte, error) {
                 "additionalProperties": false,
             },
         },
-        "required": []string{"cluster_name"},
+        "required": []string{},
     }
     var data []byte
     var err error
@@ -382,18 +381,10 @@ func GenerateDefaultFromSchema(name string) ([]byte, error) {
     // Create a map to hold the configuration
     config := make(map[string]any)
 
-    // Set the cluster name
-    config["cluster_name"] = name
-
     // Process each property in the schema, excluding 'iac'
     for key, value := range schema {
         if key == "iac" {
             continue // Skip iac section as requested
-        }
-
-        if key == "cluster_name" {
-            // This is handled separately as the top-level cluster name
-            continue
         }
 
         config[key] = generateDefaultValue(value.(map[string]any), key, name)

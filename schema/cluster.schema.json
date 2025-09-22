@@ -134,9 +134,6 @@
       },
       "type": "object"
     },
-    "cluster_name": {
-      "type": "string"
-    },
     "gitops": {
       "properties": {
         "flux": {
@@ -174,12 +171,250 @@
       "properties": {
         "main": {
           "additionalProperties": true,
+          "properties": {
+            "availability_zone": {
+              "type": "string"
+            },
+            "ca_certificates": {
+              "type": "string"
+            },
+            "calico_encapsulation_type": {
+              "type": "string"
+            },
+            "calico_interface_autodetect": {
+              "type": "string"
+            },
+            "calico_interface_autodetect_cidr": {
+              "type": "string"
+            },
+            "calico_nat_outgoing": {
+              "type": "boolean"
+            },
+            "cluster_name": {
+              "type": "string"
+            },
+            "cni_iface": {
+              "type": "string"
+            },
+            "deploy_cluster": {
+              "type": "boolean"
+            },
+            "dns_nameservers": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "flavor_bastion": {
+              "type": "string"
+            },
+            "flavor_master": {
+              "type": "string"
+            },
+            "flavor_worker": {
+              "type": "string"
+            },
+            "floatingip_pool": {
+              "type": "string"
+            },
+            "image_id": {
+              "type": "string"
+            },
+            "image_id_windows": {
+              "type": "string"
+            },
+            "k8s_api_port": {
+              "type": "integer"
+            },
+            "k8s_hardening_enabled": {
+              "type": "boolean"
+            },
+            "kube_pod_security_exemptions_namespaces": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "kube_vip_enabled": {
+              "type": "boolean"
+            },
+            "kubelet_rotate_server_certificates": {
+              "type": "boolean"
+            },
+            "kubernetes_version": {
+              "type": "string"
+            },
+            "kubespray_version": {
+              "type": "string"
+            },
+            "loadbalancer_provider": {
+              "type": "string"
+            },
+            "master_count": {
+              "type": "integer"
+            },
+            "mtu": {
+              "type": "string"
+            },
+            "network_plugin": {
+              "type": "string"
+            },
+            "network_provider": {
+              "type": "string"
+            },
+            "node_master": {
+              "type": "string"
+            },
+            "node_worker": {
+              "type": "string"
+            },
+            "node_worker_windows": {
+              "type": "string"
+            },
+            "openstack_admin_password": {
+              "type": "string"
+            },
+            "openstack_auth_url": {
+              "type": "string"
+            },
+            "openstack_ca": {
+              "type": "string"
+            },
+            "openstack_insecure": {
+              "type": "boolean"
+            },
+            "openstack_project_domain_name": {
+              "type": "string"
+            },
+            "openstack_region": {
+              "type": "string"
+            },
+            "openstack_tenant_name": {
+              "type": "string"
+            },
+            "openstack_user_domain_name": {
+              "type": "string"
+            },
+            "openstack_user_password": {
+              "type": "string"
+            },
+            "os_hardening_enabled": {
+              "type": "boolean"
+            },
+            "router_external_network_id": {
+              "type": "string"
+            },
+            "ssh_authorized_keys": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "ssh_user": {
+              "type": "string"
+            },
+            "subnet_nodes": {
+              "type": "string"
+            },
+            "subnet_pods": {
+              "type": "string"
+            },
+            "subnet_services": {
+              "type": "string"
+            },
+            "ub_version": {
+              "type": "string"
+            },
+            "use_designate": {
+              "type": "boolean"
+            },
+            "use_octavia": {
+              "type": "boolean"
+            },
+            "vlan_id": {
+              "type": "string"
+            },
+            "vrrp_enabled": {
+              "type": "boolean"
+            },
+            "worker_count": {
+              "type": "integer"
+            },
+            "worker_count_windows": {
+              "type": "integer"
+            },
+            "worker_node_bfv_destination_type": {
+              "type": "string"
+            },
+            "worker_node_bfv_source_type": {
+              "type": "string"
+            },
+            "worker_node_bfv_volume_size": {
+              "type": "integer"
+            },
+            "worker_node_bfv_volume_type": {
+              "type": "string"
+            }
+          },
           "type": "object"
         },
         "modules": {
           "additionalProperties": {
             "additionalProperties": true,
             "type": "object"
+          },
+          "properties": {
+            "calico": {
+              "additionalProperties": true,
+              "properties": {
+                "k8s_internal_ip": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "windows_dataplane": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "kubespray-cluster": {
+              "additionalProperties": true,
+              "properties": {
+                "address_bastion": {
+                  "type": "string"
+                },
+                "k8s_api_ip": {
+                  "type": "string"
+                },
+                "master_nodes": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "windows_nodes": {
+                  "type": "string"
+                },
+                "worker_nodes": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "openstack-nova": {
+              "additionalProperties": true,
+              "properties": {
+                "network_id": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
           },
           "type": "object"
         }

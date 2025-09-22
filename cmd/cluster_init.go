@@ -119,6 +119,15 @@ func setReflectValue(field reflect.Value, value string) error {
 			return fmt.Errorf("invalid boolean value: '%s'", value)
 		}
 		field.SetBool(b)
+	case reflect.Interface:
+		// Handle interface{} types by storing the appropriately converted value
+		if b, err := strconv.ParseBool(value); err == nil {
+			field.Set(reflect.ValueOf(b))
+		} else if i, err := strconv.ParseInt(value, 10, 64); err == nil {
+			field.Set(reflect.ValueOf(i))
+		} else {
+			field.Set(reflect.ValueOf(value))
+		}
 	default:
 		return fmt.Errorf("unsupported field type: %s", field.Type())
 	}
@@ -225,9 +234,8 @@ func newClusterInitCmd() *cobra.Command {
 
             // Interactive wizard has been removed; name must be provided
 
-            // Derive the final cluster name from cfg.ClusterName (after overrides)
-            // so file naming is based on the YAML's cluster_name key.
-            name = cfg.ClusterName
+            // Use the name parameter directly since cluster_name is no longer top-level
+            // The name is set from the positional argument and may be overridden by flags
 
 			// Handle --force
 			force, _ := cmd.Flags().GetBool("force")
@@ -254,8 +262,8 @@ func newClusterInitCmd() *cobra.Command {
 			// Persist config
             // If no SOPS key location provided, generate one named after cluster
             disableKeygen, _ := cmd.Flags().GetBool("no-sops-keygen")
-            if !disableKeygen && cfg.Secrets.SopsAgeKeyFile == "" && cfg.ClusterName != "" {
-                if err := generateDefaultSOPSKey(cfg.ClusterName, &cfg); err != nil {
+            if !disableKeygen && cfg.Secrets.SopsAgeKeyFile == "" && name != "" {
+                if err := generateDefaultSOPSKey(name, &cfg); err != nil {
                     return fmt.Errorf("failed to generate default SOPS key: %w", err)
                 }
             }
@@ -274,7 +282,7 @@ func newClusterInitCmd() *cobra.Command {
             }
 
             // Save the YAML file directly
-            path, err := config.ConfigPath(cfg.ClusterName)
+            path, err := config.ConfigPath(name)
             if err != nil {
                 return err
             }
@@ -282,7 +290,7 @@ func newClusterInitCmd() *cobra.Command {
             if err := os.WriteFile(path, finalYAML, 0o600); err != nil {
                 return fmt.Errorf("failed to write config file: %w", err)
             }
-            fmt.Fprintf(cmd.OutOrStdout(), "Created cluster configuration %s\n", cfg.ClusterName)
+            fmt.Fprintf(cmd.OutOrStdout(), "Created cluster configuration %s\n", name)
             return nil
         },
     }
