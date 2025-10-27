@@ -1,8 +1,8 @@
 kubectl --namespace etcd-backup \
 create secret generic etcd-backup-secrets \
 --type Opaque \
---from-literal=ACCESS_KEY="{{ (index .OpenCenter.Cluster ).Aws_access_key }}" \
---from-literal=SECRET_KEY="{{ (index .OpenCenter.Cluster ).Aws_secret_access_key }}" \
+--from-literal=ACCESS_KEY="{{ .OpenCenter.Cluster.AWSAccessKey }}" \
+--from-literal=SECRET_KEY="{{ .OpenCenter.Cluster.AWSSecretAccessKey }}" \
 --from-literal=S3_HOST="https://swift.api.dfw3.rackspacecloud.com" \
 --from-literal=S3_REGION="DFW3" \
 --from-literal=ETCDCTL_API="3" \
