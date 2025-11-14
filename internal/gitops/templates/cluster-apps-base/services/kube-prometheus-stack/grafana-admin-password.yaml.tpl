@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
-  admin-password: VXRZNVdYOWFHTVRoVw==
-  admin-user: YWRtaW4=
+  admin-password: {{ .Secrets.Grafana.AdminPassword | b64enc }}
+  admin-user: {{ "admin" | b64enc }}
 kind: Secret
 metadata:
   creationTimestamp: null
