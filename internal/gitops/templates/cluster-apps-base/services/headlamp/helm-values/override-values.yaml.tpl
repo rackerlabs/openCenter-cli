@@ -1,9 +1,9 @@
 config:
   baseURL: ""
   oidc:
-    clientID: opencenter
-    clientSecret: f8V0we25ajxjm9OMpFz9BsYObGTYKM4Y
-    issuerURL: https://auth.dev.sjc3.rmpk.dev/realms/opencenter
+    clientID: {{ .OpenCenter.Services.headlamp.HeadlampOIDCClientID | default "opencenter" }}
+    clientSecret: {{ .Secrets.Headlamp.OIDCClientSecret }}
+    issuerURL: {{ .OpenCenter.Services.headlamp.HeadlampOIDCIssuerURL | default (printf "https://auth.%s/realms/opencenter" .OpenCenter.Cluster.ClusterFQDN) }}
     scopes: email,profile
   pluginsDir: /build/plugins
 initContainers:
