@@ -2,21 +2,21 @@ loki:
   auth_enabled: true
   storage:
     bucketNames:
-      chunks: stage-cluster-loki
-      ruler: stage-cluster-loki
-      admin: stage-cluster-loki
+      chunks: {{ .OpenCenter.Services.loki.LokiBucketName | default (printf "%s-loki" .OpenCenter.Cluster.ClusterName) }}
+      ruler: {{ .OpenCenter.Services.loki.LokiBucketName | default (printf "%s-loki" .OpenCenter.Cluster.ClusterName) }}
+      admin: {{ .OpenCenter.Services.loki.LokiBucketName | default (printf "%s-loki" .OpenCenter.Cluster.ClusterName) }}
     type: swift
     swift:
-      auth_url: https://keystone.api.sjc3.rackspacecloud.com/v3/
+      auth_url: {{ .OpenCenter.Services.loki.SwiftAuthURL }}
       auth_version: 3
       internal: false
-      username: prat4036
-      password: 5d5e874bbdbe4112a95aef520f97ce0b
-      user_domain_name: rackspace_cloud_domain
-      project_name: 981977_Flex
-      project_domain_name: rackspace_cloud_domain
-      region_name: SJC3
-      container_name: stage-cluster-loki
+      username: {{ .OpenCenter.Services.loki.SwiftUsername }}
+      password: {{ .Secrets.Loki.SwiftPassword }}
+      user_domain_name: {{ .OpenCenter.Services.loki.SwiftDomainName }}
+      project_name: {{ .OpenCenter.Services.loki.SwiftProjectName }}
+      project_domain_name: {{ .OpenCenter.Services.loki.SwiftDomainName }}
+      region_name: {{ .OpenCenter.Services.loki.SwiftRegion }}
+      container_name: {{ .OpenCenter.Services.loki.LokiBucketName | default (printf "%s-loki" .OpenCenter.Cluster.ClusterName) }}
       max_retries: 5
       connect_timeout: 10s
       request_timeout: 30s
@@ -39,8 +39,8 @@ write:
       memory: 1Gi
   persistence:
     enabled: true
-    size: 20Gi
-    storageClass: csi-cinder-sc-delete
+    size: {{ .OpenCenter.Services.loki.LokiVolumeSize | default 20 }}Gi
+    storageClass: {{ .OpenCenter.Services.loki.LokiStorageClass | default .OpenCenter.Storage.DefaultStorageClass | default "csi-cinder-sc-delete" }}
   podAntiAffinityPreset: soft
 read:
   replicas: 3
@@ -53,8 +53,8 @@ read:
       memory: 1Gi
   persistence:
     enabled: true
-    size: 20Gi
-    storageClass: csi-cinder-sc-delete
+    size: {{ .OpenCenter.Services.loki.LokiVolumeSize | default 20 }}Gi
+    storageClass: {{ .OpenCenter.Services.loki.LokiStorageClass | default .OpenCenter.Storage.DefaultStorageClass | default "csi-cinder-sc-delete" }}
   podAntiAffinityPreset: soft
 backend:
   replicas: 3
@@ -67,8 +67,8 @@ backend:
       memory: 1Gi
   persistence:
     enabled: true
-    size: 20Gi
-    storageClass: csi-cinder-sc-delete
+    size: {{ .OpenCenter.Services.loki.LokiVolumeSize | default 20 }}Gi
+    storageClass: {{ .OpenCenter.Services.loki.LokiStorageClass | default .OpenCenter.Storage.DefaultStorageClass | default "csi-cinder-sc-delete" }}
   podAntiAffinityPreset: soft
 gateway:
   replicas: 2
