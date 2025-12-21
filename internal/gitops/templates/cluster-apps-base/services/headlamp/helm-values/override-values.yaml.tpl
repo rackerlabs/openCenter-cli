@@ -6,10 +6,10 @@ config:
         secret:
             create: true
         clientID: opencenter
-        clientSecret: {{ .Secrets.Headlamp.oidc_client_secret }}
-        issuerURL: https://auth.{{ .OpenCenter.Cluster.ClusterName }}.{{ .OpenCenter.Cluster.ClusterRegion }}.k8s.opencenter.cloud/realms/opencenter
+        clientSecret: {{ .Secrets.Headlamp.OIDCClientSecret }}
+        issuerURL: https://auth.{{ .OpenCenter.Cluster.ClusterName }}.{{ .OpenCenter.Meta.Region }}.k8s.opencenter.cloud/realms/opencenter
         scopes: openid profile email groups
-        callbackURL: https://headlamp.{{ .OpenCenter.Cluster.ClusterName }}.{{ .OpenCenter.Cluster.ClusterRegion }}.k8s.opencenter.cloud/oidc-callback
+        callbackURL: https://headlamp.{{ .OpenCenter.Cluster.ClusterName }}.{{ .OpenCenter.Meta.Region }}.k8s.opencenter.cloud/oidc-callback
     pluginsDir: /build/plugins
 initContainers:
     - command:

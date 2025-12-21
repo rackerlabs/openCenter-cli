@@ -4,11 +4,11 @@ storage:
     trace:
         backend: s3
         s3:
-            bucket: {{ OpenCenter.Cluster.Name }}-tempo
-            endpoint: swift.api.{{ .OpenCenter.OpenStack.Region }}.rackspacecloud.com
-            access_key: {{ Secrets.Tempo.AccessKey }}
-            secret_key: {{ Secrets.Tempo.SecretKey }}
-            region: {{ .OpenCenter.Services.Tempo.Region }}
+            bucket: {{ .OpenCenter.Cluster.ClusterName }}-tempo
+            endpoint: swift.api.{{ .OpenCenter.Meta.Region }}.rackspacecloud.com
+            access_key: {{ .Secrets.Tempo.AccessKey }}
+            secret_key: {{ .Secrets.Tempo.SecretKey }}
+            region: {{ (index .OpenCenter.Services "tempo").Region }}
             insecure: false
 multitenancyEnabled: true
 ingester:

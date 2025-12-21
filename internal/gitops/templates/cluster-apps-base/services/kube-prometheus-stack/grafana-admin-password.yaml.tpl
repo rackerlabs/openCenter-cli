@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
-    admin-password: {{ .Secrets.Grafana.password | quote }}
-    admin-user: {{ .Secrets.Grafana.User | quote }}
+    admin-password: {{ .Secrets.Grafana.AdminPassword | quote }}
+    admin-user: admin
 kind: Secret
 metadata:
     name: grafana-admin-password

@@ -19,10 +19,10 @@ loki:
         type: s3
         s3:
             s3: null
-            endpoint: https://swift.api.{{ .OpenCenter.Cluster.ClusterRegion }}.rackspacecloud.com/v1/AUTH_ccfd4502116e41fd970e9bb6ebdcbbc6/
+            endpoint: https://swift.api.{{ .OpenCenter.Meta.Region }}.rackspacecloud.com/v1/AUTH_ccfd4502116e41fd970e9bb6ebdcbbc6/
             region: null
-            secretAccessKey: {{ .Secrets.Loki.AWSAccesKey }} 
-            accessKeyId: {{ .Secrets.Loki.AWSAccesKeyID }}
+            secretAccessKey: {{ .Secrets.Loki.S3SecretAccessKey }} 
+            accessKeyId: {{ .Secrets.Loki.S3AccessKeyID }}
             signatureVersion: null
             s3ForcePathStyle: false
             insecure: false
