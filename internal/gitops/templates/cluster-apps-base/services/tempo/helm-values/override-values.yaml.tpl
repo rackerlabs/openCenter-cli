@@ -6,8 +6,8 @@ storage:
         s3:
             bucket: {{ .OpenCenter.Cluster.ClusterName }}-tempo
             endpoint: swift.api.{{ .OpenCenter.Meta.Region }}.rackspacecloud.com
-            access_key: {{ .Secrets.Tempo.AccessKey }}
-            secret_key: {{ .Secrets.Tempo.SecretKey }}
+            access_key: {{ .GetTempoS3AccessKey }}
+            secret_key: {{ .GetTempoS3SecretKey }}
             region: {{ (index .OpenCenter.Services "tempo").Region }}
             insecure: false
 multitenancyEnabled: true
