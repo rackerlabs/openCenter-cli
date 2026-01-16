@@ -7,9 +7,9 @@ config:
             create: true
         clientID: opencenter
         clientSecret: {{ .Secrets.Headlamp.OIDCClientSecret }}
-        issuerURL: https://auth.{{ .OpenCenter.Cluster.ClusterName }}.{{ .OpenCenter.Meta.Region }}.k8s.opencenter.cloud/realms/opencenter
+        issuerURL: https://{{ .OpenCenter.Services.keycloak.Hostname | default (printf "auth.%s" .OpenCenter.Cluster.ClusterFQDN) }}/realms/opencenter
         scopes: openid profile email groups
-        callbackURL: https://headlamp.{{ .OpenCenter.Cluster.ClusterName }}.{{ .OpenCenter.Meta.Region }}.k8s.opencenter.cloud/oidc-callback
+        callbackURL: https://{{ .OpenCenter.Services.headlamp.Hostname | default (printf "headlamp.%s" .OpenCenter.Cluster.ClusterFQDN) }}/oidc-callback
     pluginsDir: /build/plugins
 initContainers:
     - command:
