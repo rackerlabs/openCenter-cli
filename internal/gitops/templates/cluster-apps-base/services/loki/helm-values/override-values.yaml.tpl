@@ -13,9 +13,9 @@ loki:
                 period: 24h
     storage:
         bucketNames:
-            chunks: {{ .OpenCenter.Cluster.Name }}-loki
-            ruler: {{ .OpenCenter.Cluster.Name }}-loki
-            admin: {{ .OpenCenter.Cluster.Name }}-loki
+            chunks: {{ .OpenCenter.Meta.Name }}-loki
+            ruler: {{ .OpenCenter.Meta.Name }}-loki
+            admin: {{ .OpenCenter.Meta.Name }}-loki
         type: s3
         s3:
             s3: null
