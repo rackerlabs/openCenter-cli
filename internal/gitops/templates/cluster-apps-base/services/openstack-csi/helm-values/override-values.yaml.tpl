@@ -7,10 +7,10 @@ secret:
   data:
     cloud.conf: |-
       [Global]
-      auth-url = https://keystone.api.{{ .OpenCenter.OpenStack.Region }}.rackspacecloud.com/v3
-      application-credential-id = {{ .OpenCenter.Secrets.OpenStackCSI.AppCredsID }}
-      application-credential-secret = {{ .OpenCenter.Secrets.OpenStackCSI.AppCredsSecret }}
-      domain-name = {{ .OpenCenter.OpenStack.DomainName }}
-      region = {{ .OpenCenter.OpenStack.Region }}
-      tenant-name = {{ .OpenCenter.OpenStack.TenantName }}
-      tls-insecure =  false
+      auth-url = {{ .OpenCenter.Infrastructure.Cloud.OpenStack.AuthURL }}
+      application-credential-id = {{ .OpenCenter.Infrastructure.Cloud.OpenStack.ApplicationCredentialID }}
+      application-credential-secret = {{ .OpenCenter.Infrastructure.Cloud.OpenStack.ApplicationCredentialSecret }}
+      domain-name = {{ .OpenCenter.Infrastructure.Cloud.OpenStack.Domain }}
+      region = {{ .OpenCenter.Infrastructure.Cloud.OpenStack.Region }}
+      tenant-name = {{ .OpenCenter.Infrastructure.Cloud.OpenStack.TenantName }}
+      tls-insecure = {{ .OpenCenter.Infrastructure.Cloud.OpenStack.Insecure | default false }}
