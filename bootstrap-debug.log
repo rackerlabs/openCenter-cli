@@ -1,0 +1,51 @@
+Error: provisioning infrastructure: step "flux-bootstrap" failed: flux bootstrap: flux bootstrap: command failed: flux [bootstrap git --url=https://172.16.0.146:3001/newuser/test-repo.git --branch=main --path=applications/overlays/my-cluster --token-auth --username=newuser --password=dd9afe443cf7e3edb9e7695963ebfa9476f3c876 --ca-file=/Users/victor.palma/.config/opencenter/local/gitea/gitea/certs/ca.pem]: exit status 1
+► cloning branch "main" from Git repository "https://172.16.0.146:3001/newuser/test-repo.git"
+✔ cloned repository
+► generating component manifests
+✔ generated component manifests
+✔ committed component manifests to "main" ("df505651603358c2749742aac646b8b39118d435")
+► pushing component manifests to "https://172.16.0.146:3001/newuser/test-repo.git"
+► installing components in "flux-system" namespace
+✔ installed components
+✔ reconciled components
+► determining if source secret "flux-system/flux-system" exists
+► generating source secret
+► applying source secret "flux-system/flux-system"
+✔ reconciled source secret
+► generating sync manifests
+✔ generated sync manifests
+✔ committed sync manifests to "main" ("a690d7c11455e9857dea3bfeb97331dbb684942f")
+► pushing sync manifests to "https://172.16.0.146:3001/newuser/test-repo.git"
+► applying sync manifests
+✔ reconciled sync configuration
+◎ waiting for GitRepository "flux-system/flux-system" to be reconciled
+✔ GitRepository reconciled successfully
+◎ waiting for Kustomization "flux-system/flux-system" to be reconciled
+✗ kustomization 'flux-system/flux-system' not ready: 'kustomize build failed: accumulating resources: accumulation err='accumulating resources from './managed-services/fluxcd': read /tmp/kustomization-1217485177/applications/overlays/my-cluster/managed-services/fluxcd: is a directory': couldn't make target for path '/tmp/kustomization-1217485177/applications/overlays/my-cluster/managed-services/fluxcd': kustomization.yaml is empty'
+► confirming components are healthy
+✔ helm-controller: deployment ready
+✔ kustomize-controller: deployment ready
+✔ notification-controller: deployment ready
+✔ source-controller: deployment ready
+✔ all components are healthy
+✗ bootstrap failed with 1 health check failure(s): error while waiting for Kustomization to be ready: 'kustomization 'flux-system/flux-system' not ready: 'kustomize build failed: accumulating resources: accumulation err='accumulating resources from './managed-services/fluxcd': read /tmp/kustomization-1217485177/applications/overlays/my-cluster/managed-services/fluxcd: is a directory': couldn't make target for path '/tmp/kustomization-1217485177/applications/overlays/my-cluster/managed-services/fluxcd': kustomization.yaml is empty''
+Usage:
+  opencenter cluster bootstrap [name] [flags]
+
+Flags:
+      --container-runtime string   container runtime for kind clusters (docker or podman)
+      --dry-run                    show planned actions without executing
+      --from-step string           restart bootstrap from the specified step ID
+  -h, --help                       help for bootstrap
+      --kubeconfig string          path to kubeconfig used by bootstrap actions (defaults to the cluster-owned kubeconfig path)
+      --log string                 log file path (defaults to <git_dir>/infrastructure/clusters/<name>/logs/bootstrap-YYYY-MM-DD-TIMESTAMP.log)
+      --restart                    rerun all bootstrap steps and ignore saved state
+      --step string                run a single bootstrap step by ID
+
+Global Flags:
+      --config string       alternative cluster configuration file path
+      --config-dir string   configuration directory (defaults to ~/.config/opencenter on Linux/macOS)
+      --log-level string    set log level explicitly (debug, info, warn, error) (default "warn")
+      --set stringArray     override configuration values using dot notation (e.g., --set spec.provider=openstack)
+      --show-active         display the current active cluster
+
